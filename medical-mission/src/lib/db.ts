@@ -180,8 +180,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   // Service breakdown - include all active services
   const svcMap: Record<string, number> = {}
-  ;(svcBreakdownRes.data || []).forEach((ps: { service: { name: string } | null }) => {
-    const name = ps.service?.name || 'Unknown'
+  ;(svcBreakdownRes.data || []).forEach((ps: { service: { name: string }[] | null }) => {
+    const name = ps.service?.[0]?.name || 'Unknown'
     svcMap[name] = (svcMap[name] || 0) + 1
   })
   const activeServiceNames = new Set((allServicesRes.data || []).map((s: { name: string }) => s.name))
