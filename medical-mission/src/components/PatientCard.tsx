@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChevronDown, User, Phone, MapPin, Eye, Pencil, Trash2, Check, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { logService, logCounsel } from '@/lib/db'
@@ -22,11 +22,16 @@ export function PatientCard({
   patient, activeServices, isOpen, onToggle,
   onViewDetail, onEdit, onDelete, onRefresh,
 }: PatientCardProps) {
-  const saved = localStorage.getItem(`counselorName_${patient.id}`) || ''
-  const [counselorName, setCounselorName] = useState(saved)
-  const [tempCounselorName, setTempCounselorName] = useState(saved)
+  const [counselorName, setCounselorName] = useState('')
+  const [tempCounselorName, setTempCounselorName] = useState('')
   const [logging, setLogging] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem(`counselorName_${patient.id}`) || '' : ''
+    setCounselorName(saved)
+    setTempCounselorName(saved)
+  }, [patient.id])
 
   const handleSaveCounselorName = () => {
     const name = tempCounselorName.trim()

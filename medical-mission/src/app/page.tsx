@@ -10,14 +10,14 @@ type Tab = 'dashboard' | 'patients' | 'admin'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [isOnline, setIsOnline] = useState(true)
 
   useEffect(() => {
-    const up = () => setIsOnline(true)
-    const down = () => setIsOnline(false)
-    window.addEventListener('online', up)
-    window.addEventListener('offline', down)
-    return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down) }
+    const updateOnline = () => setIsOnline(navigator.onLine)
+    updateOnline()
+    window.addEventListener('online', updateOnline)
+    window.addEventListener('offline', updateOnline)
+    return () => { window.removeEventListener('online', updateOnline); window.removeEventListener('offline', updateOnline) }
   }, [])
 
   return (

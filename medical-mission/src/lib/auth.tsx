@@ -15,7 +15,12 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('admin_auth') === 'true')
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('admin_auth') : null
+    if (stored === 'true') setIsAdmin(true)
+  }, [])
 
   const login = (username: string, password: string) => {
     // Credentials checked client-side for this offline-capable system
@@ -23,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const validPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
     if (username === validUser && password === validPass) {
       setIsAdmin(true)
-      sessionStorage.setItem('admin_auth', 'true')
+      if (typeof window !== 'undefined') sessionStorage.setItem('admin_auth', 'true')
       return true
     }
     return false
@@ -31,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setIsAdmin(false)
-    sessionStorage.removeItem('admin_auth')
+    if (typeof window !== 'undefined') sessionStorage.removeItem('admin_auth')
   }
 
   return (
