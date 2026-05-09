@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+:root {
+  --g50: #F0F7F0;
+  --g100: #C8E6C9;
+  --g200: #A5D6A7;
+  --g400: #4CAF50;
+  --g600: #2E7D32;
+  --g700: #1B5E20;
+  --bg: #FFFFFF;
+  --bg2: #F5FAF5;
+  --bg3: #EEF6EE;
+  --bdr: #D8E8D8;
+  --bdr2: #B8D8B2;
+  --t1: #1C2B1C;
+  --t2: #3D5C3D;
+  --t3: #7A9A7A;
+  --grey: #757575;
+  --red: #C62828;
+  --red50: #FFF0F0;
+  --red100: #FFCDD2;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg2);
+  color: var(--t1);
+  -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── RESPONSIVE SHELL ── */
+.app-shell {
+  min-height: 100vh;
+  background: var(--bg2);
+  display: flex;
+  justify-content: center;
+}
+
+.app-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Phone: full width */
+@media (max-width: 639px) {
+  .app-inner { max-width: 100%; }
+}
+
+/* Tablet: full width up to 768px */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .app-inner { max-width: 100%; }
+}
+
+/* Laptop / Desktop: max 1200px centered with side padding */
+@media (min-width: 1024px) {
+  .app-inner {
+    max-width: 1200px;
+    box-shadow: 0 0 0 1px var(--bdr);
+  }
+  .app-shell {
+    background: #E8F5E9;
+  }
+}
+
+.app-content {
+  flex: 1;
+  overflow: auto;
+}
+
+/* ── INPUTS — always white bg, grey text ── */
+input, textarea, select {
+  background: #ffffff !important;
+  color: var(--grey) !important;
+  outline: none;
+  font-family: inherit;
+}
+input::placeholder, textarea::placeholder { color: #BDBDBD; }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--g400) !important;
+  box-shadow: 0 0 0 2px rgba(76,175,80,0.15);
+}
+
+/* ── ACTION BUTTON ── */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  color: var(--g600);
+  border: 1px solid var(--bdr2);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .12s, background .12s, border-color .12s;
+  user-select: none;
+  font-family: inherit;
+}
+.action-btn:active {
+  color: #9E9E9E !important;
+  background: #F5F5F5 !important;
+  border-color: #BDBDBD !important;
+}
+.action-btn.sm { padding: 5px 11px; font-size: 11px; }
+.action-btn.wide { justify-content: center; width: 100%; padding: 10px 16px; font-size: 13px; }
+.action-btn.danger { color: var(--red); border-color: var(--red100); }
+.action-btn.danger:active {
+  color: #9E9E9E !important;
+  background: #F5F5F5 !important;
+  border-color: #BDBDBD !important;
+}
+
+/* ── RESPONSIVE GRID — dashboard stat cards ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* ── RESPONSIVE GRID — patient info row ── */
+@media (min-width: 640px) {
+  .patient-info-row {
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--g200); border-radius: 4px; }
