@@ -88,21 +88,21 @@ export function PatientsPage() {
     <div style={{ background: '#F5FAF5', minHeight: '100%' }}>
       {/* Search, filter, and add */}
       <div style={{ background: '#fff', borderBottom: '1px solid #D8E8D8', padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <div style={{ maxWidth: 400, position: 'relative' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1 }}>
+          <div style={{ maxWidth: '60%', flex: 1, position: 'relative' }}>
             <Search size={15} color="#7A9A7A" style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
               placeholder="Search by name, ID, or contact…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '8px 10px 8px 30px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 12, background: '#fff', color: '#757575' }}
+              style={{ width: '100%', padding: '8px 10px 8px 30px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 14, background: '#fff', color: '#757575' }}
             />
           </div>
           <select
             value={filterService}
             onChange={e => setFilterService(e.target.value)}
-            style={{ padding: '8px 10px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 12, background: '#fff', color: '#757575', minWidth: 120 }}
+            style={{ padding: '8px 10px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 14, background: '#fff', color: '#757575', minWidth: 120 }}
           >
             <option value="">All services</option>
             {services.map(svc => (
@@ -116,12 +116,12 @@ export function PatientsPage() {
       </div>
 
       <div style={{ padding: 14 }}>
-        <div style={{ fontSize: 11, color: '#7A9A7A', marginBottom: 10 }}>
+        <div style={{ fontSize: 13, color: '#7A9A7A', marginBottom: 10 }}>
           {loading ? 'Loading…' : `${patients.length} patient${patients.length !== 1 ? 's' : ''} ${filterService ? 'with selected service' : 'registered'} · showing ${patients.length === 0 ? 0 : Math.min((page-1)*PAGE_SIZE+1, patients.length)}–${Math.min(page*PAGE_SIZE, patients.length)}`}
         </div>
 
         {!loading && paginated.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 40, color: '#7A9A7A', fontSize: 13 }}>
+          <div style={{ textAlign: 'center', padding: 40, color: '#7A9A7A', fontSize: 15 }}>
             {search || filterService ? 'No patients found matching your search/filter.' : 'No patients registered yet. Tap "Add" to register the first patient.'}
           </div>
         ) : (
@@ -143,21 +143,21 @@ export function PatientsPage() {
         {totalPages > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '10px 0 2px' }}>
             <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
-              style={{ padding: '4px 10px', fontSize: 11, border: '1px solid #D8E8D8', borderRadius: 8, background: '#fff', color: '#3D5C3D', cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}>
+              style={{ padding: '4px 10px', fontSize: 13, border: '1px solid #D8E8D8', borderRadius: 8, background: '#fff', color: '#3D5C3D', cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}>
               ← Prev
             </button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               const p = i + 1
               return (
                 <button key={p} onClick={() => setPage(p)}
-                  style={{ padding: '4px 10px', fontSize: 11, border: '1px solid #D8E8D8', borderRadius: 8, background: page === p ? '#2E7D32' : '#fff', color: page === p ? '#fff' : '#3D5C3D', cursor: 'pointer' }}>
+                  style={{ padding: '4px 10px', fontSize: 13, border: '1px solid #D8E8D8', borderRadius: 8, background: page === p ? '#2E7D32' : '#fff', color: page === p ? '#fff' : '#3D5C3D', cursor: 'pointer' }}>
                   {p}
                 </button>
               )
             })}
-            {totalPages > 5 && <span style={{ fontSize: 11, color: '#7A9A7A' }}>… {totalPages}</span>}
+            {totalPages > 5 && <span style={{ fontSize: 13, color: '#7A9A7A' }}>… {totalPages}</span>}
             <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}
-              style={{ padding: '4px 10px', fontSize: 11, border: '1px solid #D8E8D8', borderRadius: 8, background: '#fff', color: '#3D5C3D', cursor: page === totalPages ? 'default' : 'pointer', opacity: page === totalPages ? 0.5 : 1 }}>
+              style={{ padding: '4px 10px', fontSize: 13, border: '1px solid #D8E8D8', borderRadius: 8, background: '#fff', color: '#3D5C3D', cursor: page === totalPages ? 'default' : 'pointer', opacity: page === totalPages ? 0.5 : 1 }}>
               Next →
             </button>
           </div>

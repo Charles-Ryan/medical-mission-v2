@@ -84,22 +84,22 @@ export function PatientCard({
     }}>
       {/* Main row */}
       <div onClick={onToggle} style={{ padding: '12px 14px', display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
-        <span style={{ fontSize: 11, fontWeight: 500, color: '#7A9A7A', flexShrink: 0, width: 32, paddingTop: 2 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: '#7A9A7A', flexShrink: 0, width: 32, paddingTop: 2 }}>
           {paddedId}
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#1C2B1C' }}>{patient.full_name}</div>
+          <div style={{ fontSize: 15, fontWeight: 500, color: '#1C2B1C' }}>{patient.full_name}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: 10, rowGap: 3, marginTop: 4 }}>
-            <span style={{ fontSize: 11, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
+            <span style={{ fontSize: 13, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
               <User size={12} color="#7A9A7A" />{patient.age} yrs, {patient.gender}
             </span>
             {patient.contact_number && (
-              <span style={{ fontSize: 11, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: 13, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
                 <Phone size={12} color="#7A9A7A" />{patient.contact_number}
               </span>
             )}
             {patient.address && (
-              <span style={{ fontSize: 11, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: 13, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
                 <MapPin size={12} color="#7A9A7A" />{patient.address}
               </span>
             )}

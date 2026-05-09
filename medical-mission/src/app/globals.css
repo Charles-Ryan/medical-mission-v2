@@ -57,10 +57,10 @@ html, body {
   .app-inner { max-width: 100%; }
 }
 
-/* Laptop / Desktop: max 1200px centered with side padding */
+/* Laptop / Desktop: full width to maximize horizontal space */
 @media (min-width: 1024px) {
   .app-inner {
-    max-width: 1200px;
+    max-width: 100%;
     box-shadow: 0 0 0 1px var(--bdr);
   }
   .app-shell {
@@ -95,7 +95,7 @@ input:focus, textarea:focus, select:focus {
   color: var(--g600);
   border: 1px solid var(--bdr2);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   padding: 8px 14px;
   cursor: pointer;
@@ -109,8 +109,8 @@ input:focus, textarea:focus, select:focus {
   background: #F5F5F5 !important;
   border-color: #BDBDBD !important;
 }
-.action-btn.sm { padding: 5px 11px; font-size: 11px; }
-.action-btn.wide { justify-content: center; width: 100%; padding: 10px 16px; font-size: 13px; }
+.action-btn.sm { padding: 5px 11px; font-size: 12px; }
+.action-btn.wide { justify-content: center; width: 100%; padding: 10px 16px; font-size: 14px; }
 .action-btn.danger { color: var(--red); border-color: var(--red100); }
 .action-btn.danger:active {
   color: #9E9E9E !important;

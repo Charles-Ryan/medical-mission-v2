@@ -48,7 +48,7 @@ export function DashboardPage() {
 
   const cardHdr = (title: string) => (
     <div style={{ padding: '11px 16px', borderBottom: '1px solid #D8E8D8' }}>
-      <span style={{ fontSize: 13, fontWeight: 500, color: '#1C2B1C' }}>{title}</span>
+      <span style={{ fontSize: 15, fontWeight: 500, color: '#1C2B1C' }}>{title}</span>
     </div>
   )
 
@@ -57,10 +57,10 @@ export function DashboardPage() {
 
       {/* Clock */}
       <div style={{ background: '#fff', border: '1px solid #D8E8D8', borderRadius: 12, padding: '14px 18px', marginBottom: 14 }}>
-        <div style={{ fontSize: 28, fontWeight: 500, color: '#1C2B1C', fontVariantNumeric: 'tabular-nums', letterSpacing: -0.5, lineHeight: 1 }}>
+        <div style={{ fontSize: 32, fontWeight: 500, color: '#1C2B1C', fontVariantNumeric: 'tabular-nums', letterSpacing: -0.5, lineHeight: 1 }}>
           {timeStr}
         </div>
-        <div style={{ fontSize: 12, color: '#7A9A7A', marginTop: 5 }}>{dateStr}</div>
+        <div style={{ fontSize: 14, color: '#7A9A7A', marginTop: 5 }}>{dateStr}</div>
       </div>
 
       {/* Stat cards */}
@@ -71,8 +71,8 @@ export function DashboardPage() {
           { label: 'Counselled',          value: stats?.total_counselled ?? '—' },
         ].map(({ label, value }) => (
           <div key={label} style={{ background: '#fff', border: '1px solid #D8E8D8', borderRadius: 12, padding: '14px 16px' }}>
-            <div style={{ fontSize: 11, color: '#7A9A7A', marginBottom: 6 }}>{label}</div>
-            <div style={{ fontSize: 26, fontWeight: 500, color: '#1C2B1C', lineHeight: 1 }}>
+            <div style={{ fontSize: 13, color: '#7A9A7A', marginBottom: 6 }}>{label}</div>
+            <div style={{ fontSize: 30, fontWeight: 500, color: '#1C2B1C', lineHeight: 1 }}>
               {loading ? '…' : value}
             </div>
           </div>
@@ -86,14 +86,14 @@ export function DashboardPage() {
         {card(<>
           {cardHdr('Services breakdown')}
           {loading ? (
-            <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A', fontSize: 12 }}>Loading…</div>
+            <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A', fontSize: 14 }}>Loading…</div>
           ) : stats?.service_breakdown.length === 0 ? (
-            <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A', fontSize: 12 }}>No services logged yet</div>
+            <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A', fontSize: 14 }}>No services logged yet</div>
           ) : (
             stats?.service_breakdown.map(({ name, count }) => (
               <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 16px', borderBottom: '1px solid #D8E8D8' }}>
-                <span style={{ fontSize: 12, color: '#3D5C3D' }}>{name}</span>
-                <span style={{ fontSize: 13, fontWeight: 500, color: '#1C2B1C', background: '#F0F7F0', border: '1px solid #C8E6C9', borderRadius: 6, padding: '2px 10px', minWidth: 36, textAlign: 'center' }}>{count}</span>
+                <span style={{ fontSize: 14, color: '#3D5C3D' }}>{name}</span>
+                <span style={{ fontSize: 15, fontWeight: 500, color: '#1C2B1C', background: '#F0F7F0', border: '1px solid #C8E6C9', borderRadius: 6, padding: '2px 10px', minWidth: 36, textAlign: 'center' }}>{count}</span>
               </div>
             ))
           )}
@@ -107,8 +107,8 @@ export function DashboardPage() {
               const found = stats?.counsel_breakdown.find(c => c.counsel_type === type)
               return (
                 <div key={type} style={{ background: '#F0F7F0', border: '1px solid #C8E6C9', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 12, color: '#3D5C3D' }}>{type}</span>
-                  <span style={{ fontSize: 18, fontWeight: 500, color: '#1C2B1C' }}>{loading ? '…' : (found?.count ?? 0)}</span>
+                  <span style={{ fontSize: 14, color: '#3D5C3D' }}>{type}</span>
+                  <span style={{ fontSize: 20, fontWeight: 500, color: '#1C2B1C' }}>{loading ? '…' : (found?.count ?? 0)}</span>
                 </div>
               )
             })}
