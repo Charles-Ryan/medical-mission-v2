@@ -37,7 +37,7 @@ export function PatientCard({
     const name = tempCounselorName.trim()
     setCounselorName(name)
     localStorage.setItem(`counselorName_${patient.id}`, name)
-    toast.success('Counselor name has been recorded')
+    toast.success('Counselor name recorded')
   }
 
   const loggedServiceIds = new Set(patient.patient_services.map(ps => ps.service_id))
@@ -58,7 +58,7 @@ export function PatientCard({
   }
 
   const handleLogCounsel = async (type: typeof COUNSEL_TYPES[number]) => {
-    if (logging) return
+    if (logging || loggedCounselTypes.has(type)) return
     setLogging(type)
     try {
       await logCounsel(patient.id, type, counselorName.trim() || null)
@@ -195,8 +195,8 @@ export function PatientCard({
               return (
                 <button
                   key={type}
-                  onClick={() => !done && handleLogCounsel(type)}
-                  disabled={logging !== null}
+                  onClick={() => handleLogCounsel(type)}
+                  disabled={logging !== null || done}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 4,
                     padding: '5px 10px', background: done ? '#A5D6A7' : '#fff',

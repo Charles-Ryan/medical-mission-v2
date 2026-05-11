@@ -60,14 +60,23 @@ export async function getNextPatientNumber() {
 
 export async function createPatient(patient: Omit<Patient, 'id' | 'patient_number' | 'created_at'>) {
   const supabase = createClient()
-  const nextNum = await getNextPatientNumber()
-  const { data, error } = await supabase
-    .from('patients')
-    .insert({ ...patient, patient_number: nextNum })
-    .select()
-    .single()
-  if (error) throw error
-  return data as Patient
+  const maxAttempts = 5
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const nextNum = await getNextPatientNumber()
+    const { data, error } = await supabase
+      .from('patients')
+      .insert({ ...patient, patient_number: nextNum })
+      .select()
+      .single()
+
+    if (!error) return data as Patient
+
+    const isDuplicate = error.code === '23505' || error.message?.includes('duplicate key') || error.details?.includes('already exists')
+    if (!isDuplicate) throw error
+  }
+
+  throw new Error('Could not assign unique patient number after several attempts')
 }
 
 export async function updatePatient(id: string, updates: Partial<Patient>) {
@@ -180,8 +189,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   // Service breakdown - include all active services
   const svcMap: Record<string, number> = {}
-  ;(svcBreakdownRes.data || []).forEach((ps: { service: { name: string }[] | null }) => {
-    const name = ps.service?.[0]?.name || 'Unknown'
+  ;(svcBreakdownRes.data || []).forEach((ps: { service: { name: string } | null }) => {
+    const name = ps.service?.name || 'Unknown'
     svcMap[name] = (svcMap[name] || 0) + 1
   })
   const activeServiceNames = new Set((allServicesRes.data || []).map((s: { name: string }) => s.name))

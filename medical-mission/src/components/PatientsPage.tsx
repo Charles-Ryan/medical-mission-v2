@@ -72,15 +72,24 @@ export function PatientsPage() {
   if (detailId) {
     const pt = patients.find(p => p.id === detailId)
     return (
-      <PatientDetail
-        patientId={detailId}
-        onBack={() => { setDetailId(null); load() }}
-        onEdit={() => { setEditPatient(pt as Patient | null); setShowForm(true) }}
-        onDelete={() => {
-          if (pt) handleDelete(pt)
-          setDetailId(null)
-        }}
-      />
+      <>
+        <PatientDetail
+          patientId={detailId}
+          onBack={() => { setDetailId(null); load() }}
+          onEdit={() => { setEditPatient(pt as Patient | null); setShowForm(true) }}
+          onDelete={() => {
+            if (pt) handleDelete(pt)
+            setDetailId(null)
+          }}
+        />
+        {showForm && (
+          <PatientForm
+            patient={editPatient}
+            onClose={() => { setShowForm(false); setEditPatient(null) }}
+            onSaved={() => { setShowForm(false); load() }}
+          />
+        )}
+      </>
     )
   }
 
