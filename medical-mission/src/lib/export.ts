@@ -82,7 +82,7 @@ export async function exportToPDF(
 
   doc.setFontSize(14)
   doc.setTextColor(46, 125, 50)
-  doc.text('CWOP Patient Database', 14, 16)
+  doc.text('CWOP Patient Database Report', 14, 16)
 
   doc.setFontSize(9)
   doc.setTextColor(80)

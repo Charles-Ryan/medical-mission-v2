@@ -24,8 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (username: string, password: string) => {
     // Credentials checked client-side for this offline-capable system
-    const validUser = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'admin'
-    const validPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
+    const validUser = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'pbbc-admin'
+    const validPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'pbbccwop2026'
     if (username === validUser && password === validPass) {
       setIsAdmin(true)
       if (typeof window !== 'undefined') sessionStorage.setItem('admin_auth', 'true')

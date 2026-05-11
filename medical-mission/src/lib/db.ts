@@ -178,10 +178,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const [patientsRes, servicesRes, counselRes, svcBreakdownRes, cslBreakdownRes, allServicesRes] = await Promise.all([
     supabase.from('patients').select('id', { count: 'exact', head: true }),
     supabase.from('patient_services').select('id', { count: 'exact', head: true }),
-    supabase.from('counsel_logs').select('patient_id').then(r => ({
-      ...r,
-      uniqueCount: new Set(r.data?.map(c => c.patient_id) || []).size
-    })),
+    supabase.from('counsel_logs').select('id', { count: 'exact', head: true }),
     supabase.from('patient_services').select('service:services(name)'),
     supabase.from('counsel_logs').select('counsel_type'),
     supabase.from('services').select('name').eq('is_active', true),
@@ -189,13 +186,28 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   // Service breakdown - include all active services
   const svcMap: Record<string, number> = {}
-  ;(svcBreakdownRes.data || []).forEach((ps: { service: { name: string } | null }) => {
-    const name = ps.service?.name || 'Unknown'
+
+  ;(svcBreakdownRes.data || []).forEach((ps: any) => {
+    const serviceData = Array.isArray(ps.service)
+      ? ps.service[0]
+      : ps.service
+
+    const name = (serviceData?.name || 'Unknown').trim()
+
     svcMap[name] = (svcMap[name] || 0) + 1
   })
-  const activeServiceNames = new Set((allServicesRes.data || []).map((s: { name: string }) => s.name))
+
+  const activeServiceNames = new Set(
+    (allServicesRes.data || []).map(
+      (s: { name: string }) => s.name.trim()
+    )
+  )
+
   const service_breakdown = Array.from(activeServiceNames)
-    .map(name => ({ name, count: svcMap[name] || 0 }))
+    .map(name => ({
+      name,
+      count: svcMap[name] || 0
+    }))
     .sort((a, b) => b.count - a.count)
 
   // Counsel breakdown
@@ -208,7 +220,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   return {
     total_patients: patientsRes.count || 0,
     total_services: servicesRes.count || 0,
-    total_counselled: counselRes.uniqueCount,
+    total_counselled: counselRes.count || 0,
     service_breakdown,
     counsel_breakdown,
   }
