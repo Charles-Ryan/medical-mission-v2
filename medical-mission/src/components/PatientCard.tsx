@@ -175,7 +175,15 @@ export function PatientCard({
             Add counseling
           </div>
           {/* Counselor name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <div
+            className="mobile-stack"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8,
+            }}
+          >
             <input
               ref={inputRef}
               type="text"
@@ -183,7 +191,22 @@ export function PatientCard({
               onChange={e => setTempCounselorName(e.target.value)}
               placeholder="Enter counselor name…"
               onClick={e => e.stopPropagation()}
-              style={{ flex: 1, padding: '6px 10px', fontSize: 12, borderRadius: 8, border: '1px solid #B8D8B2' }}
+              onFocus={(e) => {
+                setTimeout(() => {
+                  e.target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                  })
+                }, 300)
+              }}
+              style={{
+                flex: 1,
+                padding: '10px 12px',
+                fontSize: 16,
+                borderRadius: 10,
+                border: '1px solid #B8D8B2',
+                minWidth: 0,
+              }}
             />
             <button onClick={handleSaveCounselorName} style={{ padding: '6px 12px', background: '#2E7D32', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Save size={12} /> Save
@@ -214,7 +237,16 @@ export function PatientCard({
           </div>
 
           {/* Footer actions */}
-          <div style={{ display: 'flex', gap: 6, marginTop: 10, paddingTop: 10, borderTop: '1px solid #D8E8D8' }}>
+          <div
+            className="mobile-actions"
+            style={{
+              display: 'flex',
+              gap: 6,
+              marginTop: 10,
+              paddingTop: 10,
+              borderTop: '1px solid #D8E8D8',
+            }}
+          >
             <button className="action-btn sm" onClick={e => { e.stopPropagation(); onViewDetail() }}>
               <Eye size={11} /> View details
             </button>

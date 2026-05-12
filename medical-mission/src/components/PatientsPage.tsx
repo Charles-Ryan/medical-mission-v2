@@ -96,30 +96,114 @@ export function PatientsPage() {
   return (
     <div style={{ background: '#F5FAF5', minHeight: '100%' }}>
       {/* Search, filter, and add */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #D8E8D8', padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1 }}>
-          <div style={{ maxWidth: '60%', flex: 1, position: 'relative' }}>
-            <Search size={15} color="#7A9A7A" style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)' }} />
+      <div
+        className="mobile-stack"
+        style={{
+          background: '#fff',
+          borderBottom: '1px solid #D8E8D8',
+          padding: '12px 14px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 10,
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
+        }}
+      >
+        <div
+          className="mobile-stack"
+          style={{
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+            flex: 1,
+            width: '100%',
+          }}
+        >
+          <div
+            className="mobile-full"
+            style={{
+              maxWidth: '60%',
+              flex: 1,
+              position: 'relative',
+            }}
+          >
+            <Search
+              size={15}
+              color="#7A9A7A"
+              style={{
+                position: 'absolute',
+                left: 9,
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }}
+            />
+
             <input
               type="text"
               placeholder="Search by name, ID, or contact…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '8px 10px 8px 30px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 14, background: '#fff', color: '#757575' }}
+              onFocus={(e) => {
+                setTimeout(() => {
+                  e.target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                  })
+                }, 300)
+              }}
+              style={{
+                width: '100%',
+                padding: '12px 12px 12px 34px',
+                border: '1px solid #B8D8B2',
+                borderRadius: 10,
+                fontSize: 16,
+                background: '#fff',
+                color: '#757575',
+              }}
             />
           </div>
+
           <select
+            className="mobile-full"
             value={filterService}
             onChange={e => setFilterService(e.target.value)}
-            style={{ padding: '8px 10px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 14, background: '#fff', color: '#757575', minWidth: 120 }}
+            onFocus={(e) => {
+              setTimeout(() => {
+                e.target.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center',
+                })
+              }, 300)
+            }}
+            style={{
+              padding: '12px 10px',
+              border: '1px solid #B8D8B2',
+              borderRadius: 10,
+              fontSize: 16,
+              background: '#fff',
+              color: '#757575',
+              minWidth: 120,
+            }}
           >
             <option value="">All services</option>
+
             {services.map(svc => (
-              <option key={svc.id} value={svc.id}>{svc.name}</option>
+              <option key={svc.id} value={svc.id}>
+                {svc.name}
+              </option>
             ))}
           </select>
         </div>
-        <button className="action-btn" onClick={() => { setEditPatient(null); setShowForm(true) }}>
+
+        <button
+          className="action-btn mobile-btn"
+          onClick={() => {
+            setEditPatient(null)
+            setShowForm(true)
+          }}
+        >
           <Plus size={13} /> Add
         </button>
       </div>
