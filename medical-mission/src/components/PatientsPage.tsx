@@ -94,7 +94,16 @@ export function PatientsPage() {
   }
 
   return (
-    <div style={{ background: '#F5FAF5', minHeight: '100%' }}>
+    <div
+      style={{
+        background: '#F5FAF5',
+        height: '100dvh',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: '120px',
+      }}
+    >
       {/* Search, filter, and add */}
       <div
         className="mobile-stack"
@@ -208,7 +217,13 @@ export function PatientsPage() {
         </button>
       </div>
 
-      <div style={{ padding: 14 }}>
+      <div
+        style={{
+          padding: 14,
+          paddingBottom: 180,
+          minHeight: 'calc(100dvh - 120px)',
+        }}
+      >
         <div style={{ fontSize: 13, color: '#7A9A7A', marginBottom: 10 }}>
           {loading ? 'Loading…' : `${patients.length} patient${patients.length !== 1 ? 's' : ''} ${filterService ? 'with selected service' : 'registered'} · showing ${patients.length === 0 ? 0 : Math.min((page-1)*PAGE_SIZE+1, patients.length)}–${Math.min(page*PAGE_SIZE, patients.length)}`}
         </div>

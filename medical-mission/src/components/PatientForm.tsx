@@ -1,8 +1,13 @@
 'use client'
+
 import { useState, useEffect, useRef } from 'react'
 import { X, ChevronDown, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
-import { createPatient, updatePatient, getNextPatientNumber } from '@/lib/db'
+import {
+  createPatient,
+  updatePatient,
+  getNextPatientNumber,
+} from '@/lib/db'
 import type { Patient } from '@/lib/types'
 
 interface PatientFormProps {
@@ -19,10 +24,14 @@ function keyboardSafeScroll(el: HTMLElement | null) {
       behavior: 'smooth',
       block: 'center',
     })
-  }, 250)
+  }, 350)
 }
 
-export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
+export function PatientForm({
+  patient,
+  onClose,
+  onSaved,
+}: PatientFormProps) {
   const isEdit = !!patient
 
   const [nextNum, setNextNum] = useState<number | null>(null)
@@ -45,11 +54,16 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
   })
 
   useEffect(() => {
-    if (!isEdit) getNextPatientNumber().then(setNextNum)
+    if (!isEdit) {
+      getNextPatientNumber().then(setNextNum)
+    }
   }, [isEdit])
 
   const set = (key: string, val: string) =>
-    setForm(f => ({ ...f, [key]: val }))
+    setForm(f => ({
+      ...f,
+      [key]: val,
+    }))
 
   const handleSubmit = async () => {
     if (!form.full_name.trim()) {
@@ -93,12 +107,13 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
 
   const inputStyle = {
     width: '100%',
-    padding: '11px 12px',
+    padding: '14px 14px',
     border: '1px solid #B8D8B2',
-    borderRadius: 8,
+    borderRadius: 10,
     fontSize: 16,
     background: '#fff',
-    color: '#757575',
+    color: '#1C2B1C',
+    outline: 'none',
   }
 
   const labelStyle = {
@@ -106,7 +121,9 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
     fontWeight: 500 as const,
     color: '#3D5C3D',
     marginBottom: 4,
-    display: 'block' as const,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
   }
 
   return (
@@ -114,25 +131,29 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.4)',
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        zIndex: 100,
+        background: 'rgba(0,0,0,0.45)',
+        zIndex: 999,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        padding: '20px 12px 120px',
       }}
     >
       <div
         style={{
           background: '#F5FAF5',
-          borderRadius: '16px 16px 0 0',
+          borderRadius: 18,
           width: '100%',
           maxWidth: 600,
-          height: '100dvh',
+          margin: '0 auto',
+          minHeight: 'fit-content',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
         }}
       >
+        {/* Header */}
         <div
           style={{
             padding: '14px 16px',
@@ -141,9 +162,18 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
           }}
         >
-          <span style={{ fontSize: 15, fontWeight: 500, color: '#1C2B1C' }}>
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              color: '#1C2B1C',
+            }}
+          >
             {isEdit ? 'Edit patient' : 'New patient'}
           </span>
 
@@ -154,19 +184,24 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
               border: 'none',
               cursor: 'pointer',
               color: '#7A9A7A',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <X size={20} />
           </button>
         </div>
 
+        {/* Body */}
         <div
           style={{
             overflowY: 'auto',
+            overflowX: 'hidden',
             padding: 16,
             flex: 1,
             WebkitOverflowScrolling: 'touch',
-            paddingBottom: 180,
+            paddingBottom: 200,
           }}
         >
           {!isEdit && (
@@ -178,25 +213,25 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
                 padding: '11px 14px',
                 background: '#F0F7F0',
                 border: '1px solid #C8E6C9',
-                borderRadius: 8,
+                borderRadius: 10,
                 marginBottom: 16,
               }}
             >
               <span
                 style={{
-                  fontSize: 20,
-                  fontWeight: 500,
+                  fontSize: 22,
+                  fontWeight: 700,
                   color: '#2E7D32',
                 }}
               >
-                #{nextNum ? String(nextNum).padStart(3, '0') : '…'}
+                #{nextNum ? String(nextNum).padStart(3, '0') : '...'}
               </span>
 
               <div>
                 <div
                   style={{
                     fontSize: 11,
-                    fontWeight: 500,
+                    fontWeight: 600,
                     color: '#2E7D32',
                   }}
                 >
@@ -216,59 +251,89 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
             </div>
           )}
 
-          <div style={{ marginBottom: 12 }}>
-            <label style={labelStyle}>Full name</label>
+          {/* Full name */}
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>
+              Full name
+              <span style={{ color: '#D32F2F', fontSize: 12 }}>*</span>
+            </label>
 
             <input
+              required
               ref={fullNameRef}
               style={inputStyle}
               type="text"
               value={form.full_name}
+              placeholder="Enter full name"
               onFocus={() => keyboardSafeScroll(fullNameRef.current)}
               onChange={e => set('full_name', e.target.value)}
             />
           </div>
 
+          {/* Age + Gender */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 10,
-              marginBottom: 12,
+              gridTemplateColumns:
+                typeof window !== 'undefined' &&
+                window.innerWidth < 768
+                  ? '1fr'
+                  : '1fr 1fr',
+              gap: 12,
+              marginBottom: 14,
             }}
           >
             <div>
-              <label style={labelStyle}>Age</label>
+              <label style={labelStyle}>
+                Age
+                <span style={{ color: '#D32F2F', fontSize: 12 }}>*</span>
+              </label>
 
               <input
+                required
                 ref={ageRef}
                 style={inputStyle}
                 type="number"
                 value={form.age}
+                placeholder="Age"
                 onFocus={() => keyboardSafeScroll(ageRef.current)}
                 onChange={e => set('age', e.target.value)}
               />
             </div>
 
             <div>
-              <label style={labelStyle}>Gender</label>
+              <label style={labelStyle}>
+                Gender
+                <span style={{ color: '#D32F2F', fontSize: 12 }}>*</span>
+              </label>
 
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                }}
+              >
                 {(['Male', 'Female'] as const).map(g => (
                   <button
                     key={g}
+                    type="button"
                     onClick={() => set('gender', g)}
                     style={{
-                      padding: '9px 16px',
-                      borderRadius: 20,
-                      fontSize: 12,
+                      flex: 1,
+                      minWidth: 100,
+                      padding: '12px 16px',
+                      borderRadius: 999,
+                      fontSize: 14,
                       cursor: 'pointer',
                       background:
                         form.gender === g ? '#2E7D32' : '#fff',
                       color:
                         form.gender === g ? '#fff' : '#3D5C3D',
                       border: `1px solid ${
-                        form.gender === g ? '#2E7D32' : '#B8D8B2'
+                        form.gender === g
+                          ? '#2E7D32'
+                          : '#B8D8B2'
                       }`,
                     }}
                   >
@@ -279,7 +344,8 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
             </div>
           </div>
 
-          <div style={{ marginBottom: 12 }}>
+          {/* Contact */}
+          <div style={{ marginBottom: 14 }}>
             <label style={labelStyle}>Contact number</label>
 
             <input
@@ -287,12 +353,14 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
               style={inputStyle}
               type="tel"
               value={form.contact_number}
+              placeholder="09XXXXXXXXX"
               onFocus={() => keyboardSafeScroll(contactRef.current)}
               onChange={e => set('contact_number', e.target.value)}
             />
           </div>
 
-          <div style={{ marginBottom: 12 }}>
+          {/* Address */}
+          <div style={{ marginBottom: 14 }}>
             <label style={labelStyle}>Address</label>
 
             <input
@@ -300,30 +368,32 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
               style={inputStyle}
               type="text"
               value={form.address}
+              placeholder="Enter address"
               onFocus={() => keyboardSafeScroll(addressRef.current)}
               onChange={e => set('address', e.target.value)}
             />
           </div>
 
+          {/* Medical history toggle */}
           <div
             onClick={() => setMedOpen(o => !o)}
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '9px 12px',
+              padding: '12px 14px',
               background: '#EEF6EE',
               border: '1px solid #D8E8D8',
-              borderRadius: 8,
+              borderRadius: 10,
               cursor: 'pointer',
-              marginBottom: 6,
+              marginBottom: 8,
             }}
           >
             <div>
               <div
                 style={{
-                  fontSize: 12,
-                  fontWeight: 500,
+                  fontSize: 13,
+                  fontWeight: 600,
                   color: '#3D5C3D',
                 }}
               >
@@ -332,9 +402,9 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
             </div>
 
             {medOpen ? (
-              <ChevronUp size={13} color="#7A9A7A" />
+              <ChevronUp size={15} color="#7A9A7A" />
             ) : (
-              <ChevronDown size={13} color="#7A9A7A" />
+              <ChevronDown size={15} color="#7A9A7A" />
             )}
           </div>
 
@@ -344,16 +414,19 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
               style={{
                 ...inputStyle,
                 resize: 'vertical',
-                minHeight: 90,
+                minHeight: 120,
                 fontFamily: 'inherit',
               }}
               value={form.medical_history}
               onFocus={() => keyboardSafeScroll(medicalRef.current)}
-              onChange={e => set('medical_history', e.target.value)}
+              onChange={e =>
+                set('medical_history', e.target.value)
+              }
             />
           )}
         </div>
 
+        {/* Footer */}
         <div
           style={{
             padding: '12px 16px',
@@ -361,17 +434,21 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
             borderTop: '1px solid #D8E8D8',
             display: 'flex',
             gap: 8,
+            position: 'sticky',
+            bottom: 0,
+            zIndex: 20,
           }}
         >
           <button
             onClick={onClose}
             style={{
-              padding: '10px 16px',
+              padding: '12px 16px',
               border: '1px solid #B8D8B2',
-              borderRadius: 8,
-              fontSize: 13,
+              borderRadius: 10,
+              fontSize: 14,
               background: '#fff',
               color: '#757575',
+              cursor: 'pointer',
             }}
           >
             Cancel
@@ -384,12 +461,12 @@ export function PatientForm({ patient, onClose, onSaved }: PatientFormProps) {
             style={{
               flex: 1,
               justifyContent: 'center',
-              padding: '10px 16px',
-              fontSize: 13,
+              padding: '12px 16px',
+              fontSize: 14,
             }}
           >
             {saving
-              ? 'Saving…'
+              ? 'Saving...'
               : isEdit
               ? 'Save changes →'
               : 'Save & register →'}

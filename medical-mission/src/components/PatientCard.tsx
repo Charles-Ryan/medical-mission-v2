@@ -138,7 +138,13 @@ export function PatientCard({
 
       {/* Action panel */}
       {isOpen && (
-        <div style={{ borderTop: '1px solid #D8E8D8', padding: '12px 14px', background: '#EEF6EE' }}>
+        <div
+          style={{
+            borderTop: '1px solid #D8E8D8',
+            padding: '12px 14px 100px',
+            background: '#EEF6EE',
+          }}
+        >
           {/* Services */}
           <div style={{ fontSize: 10, fontWeight: 500, color: '#7A9A7A', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 7 }}>
             Add service
@@ -212,7 +218,14 @@ export function PatientCard({
               <Save size={12} /> Save
             </button>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 5,
+              paddingBottom: 40,
+            }}
+          >
             {COUNSEL_TYPES.map(type => {
               const done = loggedCounselTypes.has(type)
               return (
