@@ -81,17 +81,16 @@ export function DashboardPage() {
         display: 'flex',
         flexDirection: 'column',
         background: '#F5FAF5',
-        overflow: 'hidden',
       }}
     >
-      {/* SCROLL AREA */}
+      {/* SCROLLABLE CONTENT */}
       <div
         style={{
           flex: 1,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           padding: 16,
-          paddingBottom: 20,
+          paddingBottom: 140,
         }}
       >
         {/* Clock */}
@@ -245,22 +244,22 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* FIXED EXPORT BAR */}
+      {/* STICKY EXPORT BAR */}
       <div
         style={{
+          position: 'sticky',
+          bottom: 0,
           background: '#F5FAF5',
           borderTop: '1px solid #D8E8D8',
           padding: 12,
           display: 'flex',
           gap: 8,
           flexWrap: 'wrap',
-          flexShrink: 0,
         }}
       >
         <button className="action-btn" onClick={handleExportPDF}>
           <FileText size={13} /> Export PDF
         </button>
-
         <button className="action-btn" onClick={handleExportCSV}>
           <Download size={13} /> CSV
         </button>
