@@ -77,21 +77,20 @@ export function DashboardPage() {
   return (
     <div
       style={{
-        padding: 16,
-        background: '#F5FAF5',
-        minHeight: '100dvh',
+        height: '100dvh',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
+        background: '#F5FAF5',
       }}
     >
-      {/* SCROLLABLE AREA */}
+      {/* SCROLLABLE CONTENT */}
       <div
         style={{
           flex: 1,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          paddingBottom: 90,
+          padding: 16,
+          paddingBottom: 140,
         }}
       >
         {/* Clock */}
@@ -121,7 +120,7 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* Stat cards */}
+        {/* Stats */}
         <div
           style={{
             display: 'grid',
@@ -147,21 +146,14 @@ export function DashboardPage() {
               <div style={{ fontSize: 13, color: '#7A9A7A', marginBottom: 6 }}>
                 {label}
               </div>
-              <div
-                style={{
-                  fontSize: 30,
-                  fontWeight: 500,
-                  color: '#1C2B1C',
-                  lineHeight: 1,
-                }}
-              >
+              <div style={{ fontSize: 30, fontWeight: 500, color: '#1C2B1C' }}>
                 {loading ? '…' : value}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Breakdown section */}
+        {/* Breakdown */}
         <div
           style={{
             display: 'grid',
@@ -175,25 +167,11 @@ export function DashboardPage() {
             <>
               {cardHdr('Services breakdown')}
               {loading ? (
-                <div
-                  style={{
-                    padding: 20,
-                    textAlign: 'center',
-                    color: '#7A9A7A',
-                    fontSize: 14,
-                  }}
-                >
+                <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A' }}>
                   Loading…
                 </div>
               ) : stats?.service_breakdown.length === 0 ? (
-                <div
-                  style={{
-                    padding: 20,
-                    textAlign: 'center',
-                    color: '#7A9A7A',
-                    fontSize: 14,
-                  }}
-                >
+                <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A' }}>
                   No services logged yet
                 </div>
               ) : (
@@ -202,26 +180,19 @@ export function DashboardPage() {
                     key={name}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '9px 16px',
                       borderBottom: '1px solid #D8E8D8',
                     }}
                   >
-                    <span style={{ fontSize: 14, color: '#3D5C3D' }}>
-                      {name}
-                    </span>
+                    <span style={{ color: '#3D5C3D' }}>{name}</span>
                     <span
                       style={{
-                        fontSize: 15,
                         fontWeight: 500,
-                        color: '#1C2B1C',
                         background: '#F0F7F0',
                         border: '1px solid #C8E6C9',
                         borderRadius: 6,
                         padding: '2px 10px',
-                        minWidth: 36,
-                        textAlign: 'center',
                       }}
                     >
                       {count}
@@ -241,7 +212,7 @@ export function DashboardPage() {
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
                   gap: 10,
-                  padding: '12px 16px',
+                  padding: 12,
                 }}
               >
                 {COUNSEL_TYPES.map(type => {
@@ -258,19 +229,10 @@ export function DashboardPage() {
                         padding: '10px 14px',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
                       }}
                     >
-                      <span style={{ fontSize: 14, color: '#3D5C3D' }}>
-                        {type}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 20,
-                          fontWeight: 500,
-                          color: '#1C2B1C',
-                        }}
-                      >
+                      <span style={{ color: '#3D5C3D' }}>{type}</span>
+                      <span style={{ fontWeight: 500 }}>
                         {loading ? '…' : found?.count ?? 0}
                       </span>
                     </div>
@@ -280,16 +242,27 @@ export function DashboardPage() {
             </>
           )}
         </div>
+      </div>
 
-        {/* Export buttons */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="action-btn" onClick={handleExportPDF}>
-            <FileText size={13} /> Export PDF
-          </button>
-          <button className="action-btn" onClick={handleExportCSV}>
-            <Download size={13} /> CSV
-          </button>
-        </div>
+      {/* STICKY EXPORT BAR */}
+      <div
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          background: '#F5FAF5',
+          borderTop: '1px solid #D8E8D8',
+          padding: 12,
+          display: 'flex',
+          gap: 8,
+          flexWrap: 'wrap',
+        }}
+      >
+        <button className="action-btn" onClick={handleExportPDF}>
+          <FileText size={13} /> Export PDF
+        </button>
+        <button className="action-btn" onClick={handleExportCSV}>
+          <Download size={13} /> CSV
+        </button>
       </div>
     </div>
   )
