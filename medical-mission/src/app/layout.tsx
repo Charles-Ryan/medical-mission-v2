@@ -75,10 +75,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       <body
         style={{
-          fontFamily:
-            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           background: '#F5FAF5',
-          minHeight: '100vh',
+          minHeight: '100dvh',
+          margin: 0,
+          overflowX: 'hidden',
         }}
       >
         <AuthProvider>

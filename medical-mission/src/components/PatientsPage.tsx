@@ -249,26 +249,70 @@ export function PatientsPage() {
         )}
 
         {totalPages > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '10px 0 2px' }}>
-            <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}
-              style={{ padding: '4px 10px', fontSize: 13, border: '1px solid #D8E8D8', borderRadius: 8, background: '#fff', color: '#3D5C3D', cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}>
-              ← Prev
-            </button>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              const p = i + 1
-              return (
-                <button key={p} onClick={() => setPage(p)}
-                  style={{ padding: '4px 10px', fontSize: 13, border: '1px solid #D8E8D8', borderRadius: 8, background: page === p ? '#2E7D32' : '#fff', color: page === p ? '#fff' : '#3D5C3D', cursor: 'pointer' }}>
-                  {p}
-                </button>
-              )
-            })}
-            {totalPages > 5 && <span style={{ fontSize: 13, color: '#7A9A7A' }}>… {totalPages}</span>}
-            <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}
-              style={{ padding: '4px 10px', fontSize: 13, border: '1px solid #D8E8D8', borderRadius: 8, background: '#fff', color: '#3D5C3D', cursor: page === totalPages ? 'default' : 'pointer', opacity: page === totalPages ? 0.5 : 1 }}>
-              Next →
-            </button>
-          </div>
+            <div
+              style={{
+                position: 'sticky',
+                bottom: 0,
+                background: '#F5FAF5',
+                padding: '12px 10px',
+                borderTop: '1px solid #D8E8D8',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 10,
+                zIndex: 10,
+              }}
+            >
+              {/* Previous */}
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  fontSize: 13,
+                  border: '1px solid #D8E8D8',
+                  borderRadius: 10,
+                  background: '#fff',
+                  color: '#3D5C3D',
+                  opacity: page === 1 ? 0.5 : 1,
+                  cursor: page === 1 ? 'default' : 'pointer',
+                }}
+              >
+                ← Previous
+              </button>
+            
+              {/* Page indicator */}
+              <div
+                style={{
+                  fontSize: 13,
+                  color: '#2E7D32',
+                  fontWeight: 500,
+                  minWidth: 80,
+                  textAlign: 'center',
+                }}
+              >
+                {page} / {totalPages}
+              </div>
+              {/* Next */}
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  fontSize: 13,
+                  border: '1px solid #D8E8D8',
+                  borderRadius: 10,
+                  background: '#fff',
+                  color: '#3D5C3D',
+                  opacity: page === totalPages ? 0.5 : 1,
+                  cursor: page === totalPages ? 'default' : 'pointer',
+                }}
+              >
+                Next →
+              </button>
+            </div>
         )}
       </div>
 
