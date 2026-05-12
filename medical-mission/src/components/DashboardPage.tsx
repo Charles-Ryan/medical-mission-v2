@@ -66,23 +66,76 @@ export function DashboardPage() {
     </div>
   )
 
-  const cardHdr = (title: string) => (
-    <div style={{ padding: '11px 16px', borderBottom: '1px solid #D8E8D8' }}>
+  const cardHdr = (title: string, actions?: React.ReactNode) => (
+    <div
+      style={{
+        padding: '11px 16px',
+        borderBottom: '1px solid #D8E8D8',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 8,
+      }}
+    >
       <span style={{ fontSize: 15, fontWeight: 500, color: '#1C2B1C' }}>
         {title}
       </span>
+
+      {actions && (
+        <div style={{ display: 'flex', gap: 6 }}>
+          {actions}
+        </div>
+      )}
     </div>
   )
 
-  return (
-      <div
+  const exportButtons = (
+    <>
+      <button
+        onClick={handleExportPDF}
         style={{
-          height: '100dvh',
+          fontSize: 11,
+          padding: '4px 8px',
+          borderRadius: 6,
+          border: '1px solid #C8E6C9',
+          background: '#F0F7F0',
+          cursor: 'pointer',
           display: 'flex',
-          flexDirection: 'column',
-          background: '#F5FAF5',
+          alignItems: 'center',
+          gap: 4,
         }}
       >
+        <FileText size={12} /> PDF
+      </button>
+
+      <button
+        onClick={handleExportCSV}
+        style={{
+          fontSize: 11,
+          padding: '4px 8px',
+          borderRadius: 6,
+          border: '1px solid #C8E6C9',
+          background: '#F0F7F0',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        <Download size={12} /> CSV
+      </button>
+    </>
+  )
+
+  return (
+    <div
+      style={{
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#F5FAF5',
+      }}
+    >
       {/* SCROLLABLE AREA */}
       <div
         style={{
@@ -90,9 +143,10 @@ export function DashboardPage() {
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           padding: 16,
-          paddingBottom: 140, // ensures export buttons are reachable on mobile
+          paddingBottom: 140,
         }}
       >
+
         {/* Clock */}
         <div
           style={{
@@ -146,21 +200,14 @@ export function DashboardPage() {
               <div style={{ fontSize: 13, color: '#7A9A7A', marginBottom: 6 }}>
                 {label}
               </div>
-              <div
-                style={{
-                  fontSize: 30,
-                  fontWeight: 500,
-                  color: '#1C2B1C',
-                  lineHeight: 1,
-                }}
-              >
+              <div style={{ fontSize: 30, fontWeight: 500, color: '#1C2B1C' }}>
                 {loading ? '…' : value}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Breakdown section */}
+        {/* Breakdown */}
         <div
           style={{
             display: 'grid',
@@ -169,30 +216,16 @@ export function DashboardPage() {
             marginBottom: 12,
           }}
         >
-          {/* Services */}
+
+          {/* SERVICES + EXPORT BUTTONS MOVED HERE */}
           {card(
             <>
-              {cardHdr('Services breakdown')}
+              {cardHdr('Services breakdown', exportButtons)}
+
               {loading ? (
-                <div
-                  style={{
-                    padding: 20,
-                    textAlign: 'center',
-                    color: '#7A9A7A',
-                    fontSize: 14,
-                  }}
-                >
-                  Loading…
-                </div>
+                <div style={{ padding: 20, color: '#7A9A7A' }}>Loading…</div>
               ) : stats?.service_breakdown.length === 0 ? (
-                <div
-                  style={{
-                    padding: 20,
-                    textAlign: 'center',
-                    color: '#7A9A7A',
-                    fontSize: 14,
-                  }}
-                >
+                <div style={{ padding: 20, color: '#7A9A7A' }}>
                   No services logged yet
                 </div>
               ) : (
@@ -201,30 +234,13 @@ export function DashboardPage() {
                     key={name}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '9px 16px',
                       borderBottom: '1px solid #D8E8D8',
                     }}
                   >
-                    <span style={{ fontSize: 14, color: '#3D5C3D' }}>
-                      {name}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 500,
-                        color: '#1C2B1C',
-                        background: '#F0F7F0',
-                        border: '1px solid #C8E6C9',
-                        borderRadius: 6,
-                        padding: '2px 10px',
-                        minWidth: 36,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {count}
-                    </span>
+                    <span>{name}</span>
+                    <strong>{count}</strong>
                   </div>
                 ))
               )}
@@ -235,14 +251,7 @@ export function DashboardPage() {
           {card(
             <>
               {cardHdr('Counseling breakdown')}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 10,
-                  padding: '12px 16px',
-                }}
-              >
+              <div style={{ padding: 12 }}>
                 {COUNSEL_TYPES.map(type => {
                   const found = stats?.counsel_breakdown.find(
                     c => c.counsel_type === type
@@ -251,54 +260,23 @@ export function DashboardPage() {
                     <div
                       key={type}
                       style={{
-                        background: '#F0F7F0',
-                        border: '1px solid #C8E6C9',
-                        borderRadius: 8,
-                        padding: '10px 14px',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        padding: '8px 10px',
+                        marginBottom: 8,
+                        background: '#F0F7F0',
+                        borderRadius: 8,
                       }}
                     >
-                      <span style={{ fontSize: 14, color: '#3D5C3D' }}>
-                        {type}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 20,
-                          fontWeight: 500,
-                          color: '#1C2B1C',
-                        }}
-                      >
-                        {loading ? '…' : found?.count ?? 0}
-                      </span>
+                      <span>{type}</span>
+                      <strong>{found?.count ?? 0}</strong>
                     </div>
                   )
                 })}
               </div>
             </>
           )}
-        </div>
 
-        {/* Export buttons */}
-        <div
-          style={{
-            position: 'sticky',
-            bottom: 0,
-            background: '#F5FAF5',
-            borderTop: '1px solid #D8E8D8',
-            padding: 12,
-            display: 'flex',
-            gap: 8,
-            flexWrap: 'wrap',
-          }}
-        >
-          <button className="action-btn" onClick={handleExportPDF}>
-            <FileText size={13} /> Export PDF
-          </button>
-          <button className="action-btn" onClick={handleExportCSV}>
-            <Download size={13} /> CSV
-          </button>
         </div>
       </div>
     </div>
