@@ -143,6 +143,7 @@ export function PatientCard({
             borderTop: '1px solid #D8E8D8',
             padding: '12px 14px 100px',
             background: '#EEF6EE',
+            paddingBottom: 20,
           }}
         >
           {/* Services */}
@@ -223,7 +224,7 @@ export function PatientCard({
               display: 'flex',
               flexWrap: 'wrap',
               gap: 5,
-              paddingBottom: 40,
+              paddingBottom: 5,
             }}
           >
             {COUNSEL_TYPES.map(type => {
