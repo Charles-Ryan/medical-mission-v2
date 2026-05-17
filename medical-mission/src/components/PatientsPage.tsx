@@ -249,70 +249,88 @@ export function PatientsPage() {
         )}
 
         {totalPages > 1 && (
-            <div
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              padding: '18px 0 24px',
+              marginTop: 10,
+              flexWrap: 'wrap',
+              background: 'transparent',
+            }}
+          >
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
               style={{
-                position: 'sticky',
-                bottom: 0,
-                background: '#F5FAF5',
-                padding: '12px 10px',
-                borderTop: '1px solid #D8E8D8',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: 10,
-                zIndex: 10,
+                padding: '8px 14px',
+                fontSize: 13,
+                border: '1px solid #D8E8D8',
+                borderRadius: 10,
+                background: '#fff',
+                color: '#3D5C3D',
+                cursor: page === 1 ? 'default' : 'pointer',
+                opacity: page === 1 ? 0.5 : 1,
               }}
             >
-              {/* Previous */}
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
+              ← Previous
+            </button>
+
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              const p = i + 1
+
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  style={{
+                    minWidth: 38,
+                    height: 38,
+                    fontSize: 13,
+                    border: '1px solid #D8E8D8',
+                    borderRadius: 10,
+                    background: page === p ? '#2E7D32' : '#fff',
+                    color: page === p ? '#fff' : '#3D5C3D',
+                    cursor: 'pointer',
+                    fontWeight: page === p ? 600 : 400,
+                  }}
+                >
+                  {p}
+                </button>
+              )
+            })}
+
+            {totalPages > 5 && (
+              <span
                 style={{
-                  flex: 1,
-                  padding: '10px',
                   fontSize: 13,
-                  border: '1px solid #D8E8D8',
-                  borderRadius: 10,
-                  background: '#fff',
-                  color: '#3D5C3D',
-                  opacity: page === 1 ? 0.5 : 1,
-                  cursor: page === 1 ? 'default' : 'pointer',
+                  color: '#7A9A7A',
+                  padding: '0 4px',
                 }}
               >
-                ← Previous
-              </button>
-            
-              {/* Page indicator */}
-              <div
-                style={{
-                  fontSize: 13,
-                  color: '#2E7D32',
-                  fontWeight: 500,
-                  minWidth: 80,
-                  textAlign: 'center',
-                }}
-              >
-                {page} / {totalPages}
-              </div>
-              {/* Next */}
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  fontSize: 13,
-                  border: '1px solid #D8E8D8',
-                  borderRadius: 10,
-                  background: '#fff',
-                  color: '#3D5C3D',
-                  opacity: page === totalPages ? 0.5 : 1,
-                  cursor: page === totalPages ? 'default' : 'pointer',
-                }}
-              >
-                Next →
-              </button>
-            </div>
+                … {totalPages}
+              </span>
+            )}
+
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              style={{
+                padding: '8px 14px',
+                fontSize: 13,
+                border: '1px solid #D8E8D8',
+                borderRadius: 10,
+                background: '#fff',
+                color: '#3D5C3D',
+                cursor: page === totalPages ? 'default' : 'pointer',
+                opacity: page === totalPages ? 0.5 : 1,
+              }}
+            >
+              Next →
+            </button>
+          </div>
         )}
       </div>
 
