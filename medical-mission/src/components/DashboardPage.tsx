@@ -94,41 +94,41 @@ export function DashboardPage() {
       <button
         onClick={handleExportPDF}
         style={{
-          fontSize: 15,
+          fontSize: 13,
           fontWeight: 600,
-          padding: '12px 20px',
-          borderRadius: 10,
+          padding: '8px 12px',
+          borderRadius: 8,
           border: '1px solid #2E7D32',
           background: '#2E7D32',
           color: '#fff',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
+          gap: 6,
         }}
       >
-        <FileText size={18} />
-        Export PDF
+        <FileText size={16} />
+        PDF
       </button>
 
       <button
         onClick={handleExportCSV}
         style={{
-          fontSize: 15,
+          fontSize: 13,
           fontWeight: 600,
-          padding: '12px 20px',
-          borderRadius: 10,
+          padding: '8px 12px',
+          borderRadius: 8,
           border: '1px solid #2E7D32',
           background: '#2E7D32',
           color: '#fff',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
+          gap: 6,
         }}
       >
-        <Download size={18} />
-        Export CSV
+        <Download size={16} />
+        CSV
       </button>
     </>
   )
@@ -180,18 +180,6 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* Export Buttons */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 12,
-            marginBottom: 14,
-            flexWrap: 'wrap',
-          }}
-        >
-          {exportButtons}
-        </div>
-
         {/* Stat cards */}
         <div
           style={{
@@ -225,6 +213,19 @@ export function DashboardPage() {
           ))}
         </div>
 
+        {/* Export Buttons */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 12,
+            marginBottom: 14,
+            flexWrap: 'wrap',
+          }}
+        >
+          {exportButtons}
+        </div>
+
         {/* Breakdown */}
         <div
           style={{
@@ -235,7 +236,7 @@ export function DashboardPage() {
           }}
         >
 
-          {/* SERVICES + EXPORT BUTTONS MOVED HERE */}
+          {/* SERVICES */}
           {card(
             <>
               {cardHdr('Services breakdown')}
@@ -282,8 +283,8 @@ export function DashboardPage() {
                         justifyContent: 'space-between',
                         padding: '8px 10px',
                         marginBottom: 8,
-                        background: '#F0F7F0',
                         borderRadius: 8,
+                        borderBottom: '1px solid #D8E8D8',
                       }}
                     >
                       <span>{type}</span>
