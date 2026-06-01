@@ -149,22 +149,6 @@ export function DashboardPage() {
                 {dateStr}
               </div>
             </div>
-            <div style={{
-              padding: '6px 10px',
-              background: 'rgba(255,255,255,0.12)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 20,
-              fontSize: 11,
-              color: '#A5D6A7',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-            }}>
-              <TrendingUp size={12} />
-              LIVE
-            </div>
           </div>
         </div>
 

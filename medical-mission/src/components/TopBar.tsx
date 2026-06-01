@@ -59,40 +59,6 @@ export function TopBar() {
           Medical Mission
         </div>
       </div>
-
-      {/* Live indicator */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 5,
-          padding: '4px 10px',
-          background: 'rgba(255,255,255,0.12)',
-          borderRadius: 20,
-          border: '1px solid rgba(255,255,255,0.2)',
-        }}
-      >
-        <div
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: '#A5D6A7',
-            boxShadow: '0 0 0 2px rgba(165,214,167,0.4)',
-            animation: 'pulse 2s infinite',
-          }}
-        />
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)', fontWeight: 600, letterSpacing: '0.05em' }}>
-          LIVE
-        </span>
-      </div>
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
     </div>
   )
 }
