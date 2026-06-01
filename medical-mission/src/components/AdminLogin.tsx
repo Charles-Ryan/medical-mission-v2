@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle, Lock } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
 export function AdminLogin() {
@@ -12,6 +12,7 @@ export function AdminLogin() {
   const [loading, setLoading] = useState(false)
 
   const handleLogin = () => {
+    if (!username || !password) { setError(true); return }
     setLoading(true)
     setTimeout(() => {
       const ok = login(username, password)
@@ -21,31 +22,99 @@ export function AdminLogin() {
   }
 
   const inputStyle = {
-    width: '100%', padding: '9px 11px',
-    border: '1px solid #B8D8B2', borderRadius: 8,
-    fontSize: 13, background: '#ffffff', color: '#757575',
+    width: '100%',
+    padding: '14px 16px',
+    border: `1.5px solid ${error ? '#EF9A9A' : '#C8E0CA'}`,
+    borderRadius: 12,
+    fontSize: '16px',
+    background: '#ffffff',
+    color: '#152415',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '36px 16px', background: '#F5FAF5', minHeight: '100%' }}>
-      <div style={{ background: '#fff', border: '1px solid #D8E8D8', borderRadius: 12, padding: '22px 20px', width: '100%', maxWidth: 320 }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 16px',
+        background: '#F2F9F2',
+        minHeight: '100%',
+      }}
+    >
+      <div
+        style={{
+          background: '#fff',
+          border: '1px solid #C8E0CA',
+          borderRadius: 20,
+          padding: '32px 24px',
+          width: '100%',
+          maxWidth: 360,
+          boxShadow: '0 10px 40px rgba(21,36,21,0.10)',
+        }}
+      >
         {/* Lock icon */}
-        <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#F0F7F0', border: '1px solid #C8E6C9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-          <span style={{ fontSize: 20 }}>🔒</span>
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+            border: '1.5px solid #A8D0AB',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            boxShadow: '0 4px 12px rgba(31,115,38,0.15)',
+          }}
+        >
+          <Lock size={22} color="#1F7326" strokeWidth={2.5} />
         </div>
-        <div style={{ fontSize: 14, fontWeight: 500, color: '#1C2B1C', textAlign: 'center', marginBottom: 2 }}>Admin access</div>
-        <div style={{ fontSize: 11, color: '#7A9A7A', textAlign: 'center', marginBottom: 16 }}>Authorized volunteers only</div>
 
-        {/* Error */}
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: '#152415',
+            textAlign: 'center',
+            marginBottom: 4,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Admin Access
+        </div>
+        <div style={{ fontSize: 13, color: '#8AAA8C', textAlign: 'center', marginBottom: 24, fontWeight: 500 }}>
+          Authorized volunteers only
+        </div>
+
+        {/* Error banner */}
         {error && (
-          <div style={{ background: '#FFF0F0', color: '#C62828', border: '1px solid #FFCDD2', borderRadius: 8, padding: '7px 10px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-            <AlertCircle size={13} /> Incorrect username or password
+          <div
+            style={{
+              background: '#FFF0F0',
+              color: '#C62828',
+              border: '1.5px solid #FFCDD2',
+              borderRadius: 10,
+              padding: '10px 14px',
+              fontSize: 13,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 16,
+              fontWeight: 500,
+            }}
+          >
+            <AlertCircle size={15} />
+            Incorrect username or password
           </div>
         )}
 
         {/* Username */}
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#3D5C3D', marginBottom: 4 }}>Username</div>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#2E4F30', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Username
+          </div>
           <input
             style={inputStyle}
             type="text"
@@ -54,15 +123,18 @@ export function AdminLogin() {
             onChange={e => { setUsername(e.target.value); setError(false) }}
             onKeyDown={e => e.key === 'Enter' && handleLogin()}
             autoComplete="username"
+            autoCapitalize="off"
           />
         </div>
 
         {/* Password */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#3D5C3D', marginBottom: 4 }}>Password</div>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#2E4F30', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Password
+          </div>
           <div style={{ position: 'relative' }}>
             <input
-              style={{ ...inputStyle, paddingRight: 36 }}
+              style={{ ...inputStyle, paddingRight: 52 }}
               type={showPw ? 'text' : 'password'}
               placeholder="••••••••"
               value={password}
@@ -72,19 +144,33 @@ export function AdminLogin() {
             />
             <button
               onClick={() => setShowPw(v => !v)}
-              style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7A9A7A' }}
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                height: '100%',
+                width: 48,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#8AAA8C',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+              type="button"
             >
-              {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
 
-        {/* Sign in */}
+        {/* Sign in button */}
         <button
-          className="action-btn wide"
+          className="btn-primary"
           onClick={handleLogin}
           disabled={loading}
-          style={{ opacity: loading ? 0.7 : 1 }}
         >
           {loading ? 'Signing in…' : 'Sign in →'}
         </button>

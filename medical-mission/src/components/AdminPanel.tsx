@@ -35,7 +35,11 @@ export function AdminPanel() {
   useEffect(() => { load() }, [load])
 
   const openAdd = () => { setEditService(null); setForm(EMPTY_FORM); setShowForm(true) }
-  const openEdit = (svc: Service) => { setEditService(svc); setForm({ name: svc.name, category: svc.category, description: svc.description || '', is_active: svc.is_active }); setShowForm(true) }
+  const openEdit = (svc: Service) => {
+    setEditService(svc)
+    setForm({ name: svc.name, category: svc.category, description: svc.description || '', is_active: svc.is_active })
+    setShowForm(true)
+  }
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error('Service name is required'); return }
@@ -70,64 +74,101 @@ export function AdminPanel() {
 
   const handleReset = async () => {
     if (!confirm('Reset ALL patient data? This will permanently delete all patients, services logged, and counseling records. This CANNOT be undone.')) return
-    if (!confirm('Are you absolutely sure? Type OK to confirm — press Cancel to abort.')) return
-    toast.error('Reset function is disabled in this build for safety. Connect Supabase and implement via dashboard.')
+    if (!confirm('Are you absolutely sure? Press Cancel to abort.')) return
+    toast.error('Reset function is disabled in this build for safety.')
   }
 
-  const inputStyle = { width: '100%', padding: '8px 10px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 12, background: '#fff', color: '#757575' }
+  const inputStyle = {
+    width: '100%',
+    padding: '14px 16px',
+    border: '1.5px solid #C8E0CA',
+    borderRadius: 12,
+    fontSize: '16px',
+    background: '#fff',
+    color: '#152415',
+  }
 
   return (
-    <div style={{ background: '#F5FAF5', minHeight: '100%', padding: 16 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: '#1C2B1C' }}>Admin panel</span>
-        <button className="action-btn sm danger" onClick={logout}>
-          <LogOut size={11} /> Sign out
+    <div style={{ background: '#F2F9F2', minHeight: '100%', padding: 16, paddingBottom: 40 }}>
+
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: '#152415', letterSpacing: '-0.02em' }}>Admin Panel</div>
+          <div style={{ fontSize: 12, color: '#8AAA8C', marginTop: 2, fontWeight: 500 }}>Manage services & settings</div>
+        </div>
+        <button className="action-btn danger" onClick={logout} style={{ gap: 6 }}>
+          <LogOut size={14} /> Sign out
         </button>
       </div>
 
-      {/* Service management */}
-      <div style={{ fontSize: 10, fontWeight: 500, color: '#7A9A7A', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 8 }}>Service management</div>
-      <div style={{ background: '#fff', border: '1px solid #D8E8D8', borderRadius: 12, marginBottom: 12, overflow: 'hidden' }}>
-        <div style={{ padding: '11px 14px', borderBottom: '1px solid #D8E8D8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: '#1C2B1C' }}>Medical services</span>
-          <button className="action-btn sm" onClick={openAdd}><Plus size={12} /> Add</button>
+      {/* Service management section */}
+      <div className="section-label">Service Management</div>
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-header">
+          <span className="card-header-title">Medical Services</span>
+          <button className="action-btn primary sm" onClick={openAdd}>
+            <Plus size={14} /> Add service
+          </button>
         </div>
 
         {loading ? (
-          <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A', fontSize: 12 }}>Loading…</div>
+          <div style={{ padding: 28, textAlign: 'center', color: '#8AAA8C', fontSize: 13 }}>
+            <div style={{ marginBottom: 6 }}>⏳</div>
+            Loading services…
+          </div>
         ) : services.length === 0 ? (
-          <div style={{ padding: 20, textAlign: 'center', color: '#7A9A7A', fontSize: 12 }}>No services yet. Tap &quot;Add&quot; to create one.</div>
+          <div style={{ padding: 28, textAlign: 'center', color: '#8AAA8C', fontSize: 13 }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>🏥</div>
+            No services yet. Tap "Add service" to create one.
+          </div>
         ) : (
-          services.map(svc => (
-            <div key={svc.id} style={{ display: 'flex', alignItems: 'center', padding: '9px 14px', borderBottom: '1px solid #D8E8D8', gap: 8 }}>
+          services.map((svc, idx) => (
+            <div
+              key={svc.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px 16px',
+                borderBottom: idx < services.length - 1 ? '1px solid #E8F5E9' : 'none',
+                gap: 10,
+                background: idx % 2 === 0 ? '#fff' : '#FAFCFA',
+                transition: 'background 0.15s',
+              }}
+            >
+              {/* Name + category */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12, fontWeight: 500, color: '#1C2B1C' }}>{svc.name}</div>
-                <div style={{ fontSize: 10, color: '#7A9A7A', marginTop: 1 }}>{svc.category}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#152415' }}>{svc.name}</div>
+                {svc.category && (
+                  <div style={{ fontSize: 11, color: '#8AAA8C', marginTop: 2, fontWeight: 500 }}>{svc.category}</div>
+                )}
               </div>
-              {/* Active/Inactive badge + toggle pushed right */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-                <span style={{
-                  fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 20, minWidth: 54, textAlign: 'center',
-                  background: svc.is_active ? '#F0F7F0' : '#F5F5F5',
-                  color: svc.is_active ? '#1B5E20' : '#757575',
-                  border: `1px solid ${svc.is_active ? '#C8E6C9' : '#E0E0E0'}`,
-                }}>
+
+              {/* Controls */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                {/* Status badge */}
+                <span
+                  className={`badge ${svc.is_active ? 'green' : 'grey'}`}
+                  style={{ minWidth: 60, justifyContent: 'center' }}
+                >
                   {svc.is_active ? 'Active' : 'Inactive'}
                 </span>
+
                 {/* Toggle */}
-                <div onClick={() => handleToggle(svc)} style={{
-                  width: 30, height: 17, borderRadius: 9, position: 'relative',
-                  background: svc.is_active ? '#2E7D32' : '#BDBDBD', cursor: 'pointer', flexShrink: 0,
-                }}>
-                  <div style={{
-                    position: 'absolute', top: 2, left: svc.is_active ? 15 : 2,
-                    width: 13, height: 13, borderRadius: '50%', background: '#fff',
-                    transition: 'left .15s',
-                  }} />
-                </div>
-                <button className="action-btn sm" onClick={() => openEdit(svc)}><Pencil size={11} /> Edit</button>
-                <button className="action-btn sm danger" onClick={() => handleDelete(svc)}><Trash2 size={11} /> Del</button>
+                <button
+                  className={`toggle ${svc.is_active ? 'on' : 'off'}`}
+                  onClick={() => handleToggle(svc)}
+                  aria-label={`Toggle ${svc.name}`}
+                >
+                  <div className="toggle-knob" />
+                </button>
+
+                <button className="action-btn sm" onClick={() => openEdit(svc)}>
+                  <Pencil size={12} />
+                </button>
+                <button className="action-btn sm danger" onClick={() => handleDelete(svc)}>
+                  <Trash2 size={12} />
+                </button>
               </div>
             </div>
           ))
@@ -135,50 +176,137 @@ export function AdminPanel() {
       </div>
 
       {/* System settings */}
-      <div style={{ fontSize: 10, fontWeight: 500, color: '#7A9A7A', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 8 }}>System settings</div>
-      <div style={{ background: '#fff', border: '1px solid #D8E8D8', borderRadius: 12, overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '11px 14px', gap: 10 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, fontWeight: 500, color: '#1C2B1C' }}>Reset all patient data</div>
-            <div style={{ fontSize: 10, color: '#7A9A7A', marginTop: 2 }}>Permanent — cannot be undone</div>
+      <div className="section-label">System Settings</div>
+      <div className="card">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '14px 16px',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              background: '#FFF0F0',
+              border: '1px solid #FFCDD2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Trash2 size={17} color="#C62828" />
           </div>
-          <button className="action-btn sm danger" onClick={handleReset}><Trash2 size={12} /> Reset</button>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#152415' }}>Reset all patient data</div>
+            <div style={{ fontSize: 12, color: '#8AAA8C', marginTop: 2 }}>Permanently deletes all records · cannot be undone</div>
+          </div>
+          <button className="action-btn sm danger" onClick={handleReset}>
+            Reset
+          </button>
         </div>
       </div>
 
-      {/* Service form modal */}
+      {/* Service form sheet */}
       {showForm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ background: '#F5FAF5', borderRadius: '16px 16px 0 0', width: '100%', maxWidth: 600 }}>
-            <div style={{ padding: '14px 16px', background: '#fff', borderBottom: '1px solid #D8E8D8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#1C2B1C' }}>{editService ? 'Edit service' : 'New service'}</span>
-              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7A9A7A' }}><X size={20} /></button>
+        <div className="sheet-overlay" onClick={() => setShowForm(false)}>
+          <div className="sheet" onClick={e => e.stopPropagation()}>
+            <div className="sheet-handle" />
+
+            <div className="sheet-header">
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#152415' }}>
+                {editService ? 'Edit service' : 'New service'}
+              </span>
+              <button
+                onClick={() => setShowForm(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8AAA8C', padding: 4, WebkitTapHighlightColor: 'transparent' }}
+              >
+                <X size={22} />
+              </button>
             </div>
-            <div style={{ padding: 16 }}>
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 500, color: '#3D5C3D', marginBottom: 4 }}>Service name <span style={{ color: '#C62828' }}>*</span></div>
-                <input style={inputStyle} type="text" placeholder="e.g. Check up (Adult)" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+
+            <div className="sheet-body">
+              {/* Service name */}
+              <div className="field">
+                <label className="field-label">
+                  Service name <span style={{ color: '#C62828', textTransform: 'none', fontWeight: 400 }}>*</span>
+                </label>
+                <input
+                  className="field-input"
+                  style={inputStyle}
+                  type="text"
+                  placeholder="e.g. Check up (Adult)"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  autoFocus
+                />
               </div>
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 500, color: '#3D5C3D', marginBottom: 4 }}>Category</div>
-                <input style={inputStyle} type="text" placeholder="e.g. Medical, Dental, Screening" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
+
+              {/* Category */}
+              <div className="field">
+                <label className="field-label">Category</label>
+                <input
+                  className="field-input"
+                  style={inputStyle}
+                  type="text"
+                  placeholder="e.g. Medical, Dental, Screening"
+                  value={form.category}
+                  onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                />
               </div>
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 500, color: '#3D5C3D', marginBottom: 4 }}>Description (optional)</div>
-                <input style={inputStyle} type="text" placeholder="Brief description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+
+              {/* Description */}
+              <div className="field">
+                <label className="field-label">Description (optional)</label>
+                <input
+                  className="field-input"
+                  style={inputStyle}
+                  type="text"
+                  placeholder="Brief description"
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                <div onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))} style={{ width: 30, height: 17, borderRadius: 9, position: 'relative', background: form.is_active ? '#2E7D32' : '#BDBDBD', cursor: 'pointer' }}>
-                  <div style={{ position: 'absolute', top: 2, left: form.is_active ? 15 : 2, width: 13, height: 13, borderRadius: '50%', background: '#fff', transition: 'left .15s' }} />
-                </div>
-                <span style={{ fontSize: 12, color: '#3D5C3D' }}>{form.is_active ? 'Active' : 'Inactive'}</span>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => setShowForm(false)} style={{ padding: '10px 16px', border: '1px solid #B8D8B2', borderRadius: 8, fontSize: 13, background: '#fff', color: '#757575', cursor: 'pointer' }}>Cancel</button>
-                <button className="action-btn" onClick={handleSave} disabled={saving} style={{ flex: 1, justifyContent: 'center', padding: '10px 16px', fontSize: 13, opacity: saving ? 0.7 : 1 }}>
-                  {saving ? 'Saving…' : editService ? 'Save changes →' : 'Add service →'}
+
+              {/* Active toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: '1px solid #E8F5E9' }}>
+                <button
+                  className={`toggle ${form.is_active ? 'on' : 'off'}`}
+                  onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
+                >
+                  <div className="toggle-knob" />
                 </button>
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#2E4F30' }}>
+                  {form.is_active ? 'Active — will appear in services list' : 'Inactive — hidden from services list'}
+                </span>
               </div>
+            </div>
+
+            <div className="sheet-footer">
+              <button
+                onClick={() => setShowForm(false)}
+                style={{
+                  padding: '14px 20px',
+                  border: '1.5px solid #C8E0CA',
+                  borderRadius: 12,
+                  fontSize: 15,
+                  background: '#fff',
+                  color: '#8AAA8C',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontFamily: 'inherit',
+                  minHeight: 52,
+                }}
+              >
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={handleSave} disabled={saving} style={{ flex: 1 }}>
+                {saving ? 'Saving…' : editService ? 'Save changes →' : 'Add service →'}
+              </button>
             </div>
           </div>
         </div>

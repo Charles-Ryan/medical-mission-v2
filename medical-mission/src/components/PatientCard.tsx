@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { ChevronDown, User, Phone, MapPin, Eye, Pencil, Trash2, Check, Save } from 'lucide-react'
+import { ChevronDown, User, Phone, MapPin, Eye, Pencil, Trash2, Check, Save, CheckCircle, Clock, Heart } from 'lucide-react'
 import { toast } from 'sonner'
-import { logService, logCounsel } from '@/lib/db'
+import { logService, logCounsel, markPatientArrived } from '@/lib/db'
 import type { PatientWithLogs, Service } from '@/lib/types'
 
 const COUNSEL_TYPES = ['Salvation', 'Baptism', 'Assurance', 'Prayer for Health'] as const
@@ -25,6 +25,7 @@ export function PatientCard({
   const [counselorName, setCounselorName] = useState('')
   const [tempCounselorName, setTempCounselorName] = useState('')
   const [logging, setLogging] = useState<string | null>(null)
+  const [markingArrived, setMarkingArrived] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function PatientCard({
     const name = tempCounselorName.trim()
     setCounselorName(name)
     localStorage.setItem(`counselorName_${patient.id}`, name)
-    toast.success('Counselor name recorded')
+    toast.success('Counselor name saved')
   }
 
   const loggedServiceIds = new Set(patient.patient_services.map(ps => ps.service_id))
@@ -71,206 +72,358 @@ export function PatientCard({
     }
   }
 
-  const paddedId = String(patient.patient_number).padStart(3, '0')
+  const handleMarkArrived = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setMarkingArrived(true)
+    try {
+      await markPatientArrived(patient.id)
+      toast.success(`${patient.full_name} marked as arrived`)
+      onRefresh()
+    } catch {
+      toast.error('Failed to mark as arrived')
+    } finally {
+      setMarkingArrived(false)
+    }
+  }
+
+  const isPreRegPending = patient.registration_type === 'pre_registered' && !patient.is_arrived
+  const paddedId = patient.patient_number != null
+    ? String(patient.patient_number).padStart(3, '0')
+    : '—'
 
   return (
-    <div style={{
-      background: '#fff',
-      border: `1px solid ${isOpen ? '#4CAF50' : '#D8E8D8'}`,
-      borderRadius: 12,
-      marginBottom: 8,
-      overflow: 'hidden',
-      transition: 'border-color .15s',
-    }}>
-      {/* Main row */}
-      <div onClick={onToggle} style={{ padding: '12px 14px', display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: '#7A9A7A', flexShrink: 0, width: 32, paddingTop: 2 }}>
-          {paddedId}
-        </span>
+    <div
+      style={{
+        background: '#fff',
+        border: `1.5px solid ${isPreRegPending ? '#FFE082' : isOpen ? '#5DAF62' : '#C8E0CA'}`,
+        borderRadius: 14,
+        marginBottom: 10,
+        overflow: 'hidden',
+        transition: 'border-color 0.15s, box-shadow 0.15s',
+        boxShadow: isOpen
+          ? '0 4px 16px rgba(31,115,38,0.12)'
+          : '0 1px 4px rgba(21,36,21,0.06)',
+      }}
+    >
+      {/* Pre-reg banner */}
+      {isPreRegPending && (
+        <div
+          style={{
+            background: '#FFF8E1',
+            borderBottom: '1px solid #FFE082',
+            padding: '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: 12, color: '#E65100', display: 'flex', alignItems: 'center', gap: 5, fontWeight: 600 }}>
+            <Clock size={12} /> Pre-registered · awaiting arrival
+          </span>
+          <button
+            onClick={handleMarkArrived}
+            disabled={markingArrived}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '6px 12px',
+              background: '#1F7326',
+              border: 'none',
+              borderRadius: 20,
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#fff',
+              cursor: markingArrived ? 'default' : 'pointer',
+              opacity: markingArrived ? 0.7 : 1,
+              WebkitTapHighlightColor: 'transparent',
+              minHeight: 36,
+              fontFamily: 'inherit',
+            }}
+          >
+            <CheckCircle size={12} />
+            {markingArrived ? 'Marking…' : 'Mark arrived'}
+          </button>
+        </div>
+      )}
+
+      {/* Main row — clickable */}
+      <div
+        onClick={onToggle}
+        style={{
+          padding: '13px 14px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+          gap: 10,
+        }}
+      >
+        {/* Patient number */}
+        <div
+          style={{
+            flexShrink: 0,
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: isPreRegPending ? '#FFF3E0' : '#E8F5E9',
+            border: `1px solid ${isPreRegPending ? '#FFE082' : '#A8D0AB'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 11,
+            fontWeight: 700,
+            color: isPreRegPending ? '#E65100' : '#1F7326',
+            letterSpacing: '0.02em',
+          }}
+        >
+          {patient.patient_number != null ? paddedId : '—'}
+        </div>
+
+        {/* Name + info */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 500, color: '#1C2B1C' }}>{patient.full_name}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#152415', letterSpacing: '-0.01em' }}>
+            {patient.full_name}
+          </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: 10, rowGap: 3, marginTop: 4 }}>
-            <span style={{ fontSize: 13, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
-              <User size={12} color="#7A9A7A" />{patient.age} yrs, {patient.gender}
+            <span style={{ fontSize: 12, color: '#5A7E5C', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 500 }}>
+              <User size={11} color="#8AAA8C" />{patient.age} yrs, {patient.gender}
             </span>
             {patient.contact_number && (
-              <span style={{ fontSize: 13, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
-                <Phone size={12} color="#7A9A7A" />{patient.contact_number}
+              <span style={{ fontSize: 12, color: '#5A7E5C', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 500 }}>
+                <Phone size={11} color="#8AAA8C" />{patient.contact_number}
               </span>
             )}
             {patient.address && (
-              <span style={{ fontSize: 13, color: '#3D5C3D', display: 'flex', alignItems: 'center', gap: 3 }}>
-                <MapPin size={12} color="#7A9A7A" />{patient.address}
+              <span style={{ fontSize: 12, color: '#5A7E5C', display: 'flex', alignItems: 'center', gap: 3, fontWeight: 500 }}>
+                <MapPin size={11} color="#8AAA8C" />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+                  {patient.address}
+                </span>
               </span>
             )}
           </div>
+
           {/* Tags */}
           {(patient.patient_services.length > 0 || patient.counsel_logs.length > 0) && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 7 }}>
               {patient.patient_services.map(ps => (
-                <span key={ps.id} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, border: '1px solid #A5D6A7', color: '#1B5E20', background: '#C8E6C9' }}>
-                  {ps.service?.name}
+                <span key={ps.id} className="badge service">
+                  <Check size={9} strokeWidth={3} /> {ps.service?.name}
                 </span>
               ))}
               {patient.counsel_logs.map(cl => (
-                <span key={cl.id} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, border: '1px solid #4CAF50', color: '#1B5E20', background: '#A5D6A7' }}>
-                  {cl.counsel_type}{cl.counselor_name ? ` · ${cl.counselor_name}` : ''}
+                <span key={cl.id} className="badge counsel">
+                  <Heart size={9} strokeWidth={2.5} /> {cl.counsel_type}
+                  {cl.counselor_name ? ` · ${cl.counselor_name}` : ''}
                 </span>
               ))}
             </div>
           )}
         </div>
+
         {/* Chevron */}
-        <div style={{
-          flexShrink: 0, width: 26, height: 26, borderRadius: 8,
-          background: isOpen ? '#C8E6C9' : '#EEF6EE',
-          border: `1px solid ${isOpen ? '#A5D6A7' : '#D8E8D8'}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          alignSelf: 'flex-start', marginLeft: 8,
-        }}>
+        <div
+          style={{
+            flexShrink: 0,
+            width: 30,
+            height: 30,
+            borderRadius: 9,
+            background: isOpen ? '#D6EED8' : '#F2F9F2',
+            border: `1px solid ${isOpen ? '#A8D0AB' : '#C8E0CA'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            alignSelf: 'flex-start',
+            transition: 'background 0.15s, border-color 0.15s',
+          }}
+        >
           <ChevronDown
-            size={14}
-            color={isOpen ? '#2E7D32' : '#7A9A7A'}
-            style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}
+            size={15}
+            color={isOpen ? '#1F7326' : '#8AAA8C'}
+            strokeWidth={2.5}
+            style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
           />
         </div>
       </div>
 
-      {/* Action panel */}
+      {/* Expanded panel */}
       {isOpen && (
-        <div
-          style={{
-            borderTop: '1px solid #D8E8D8',
-            padding: '12px 14px 100px',
-            background: '#EEF6EE',
-            paddingBottom: 20,
-          }}
-        >
-          {/* Services */}
-          <div style={{ fontSize: 10, fontWeight: 500, color: '#7A9A7A', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 7 }}>
-            Add service
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
-            {activeServices.map(svc => {
-              const done = loggedServiceIds.has(svc.id)
-              return (
-                <button
-                  key={svc.id}
-                  onClick={() => !done && handleLogService(svc)}
-                  disabled={logging !== null}
+        <div className="card-panel" style={{ borderTop: '1px solid #E8F5E9', padding: '14px 14px 18px', background: '#F2F9F2' }}>
+
+          {isPreRegPending ? (
+            <div style={{ textAlign: 'center', padding: '8px 0 12px' }}>
+              <div style={{ fontSize: 13, color: '#8AAA8C', marginBottom: 14, lineHeight: 1.5 }}>
+                Services and counseling can be logged<br />after the patient arrives.
+              </div>
+              <button
+                onClick={handleMarkArrived}
+                disabled={markingArrived}
+                className="btn-primary"
+                style={{ maxWidth: 260, margin: '0 auto' }}
+              >
+                <CheckCircle size={16} />
+                {markingArrived ? 'Marking as arrived…' : 'Mark as arrived'}
+              </button>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
+                <button className="action-btn sm" onClick={e => { e.stopPropagation(); onEdit() }}>
+                  <Pencil size={12} /> Edit
+                </button>
+                <button className="action-btn sm danger" onClick={e => { e.stopPropagation(); onDelete() }}>
+                  <Trash2 size={12} /> Delete
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Services */}
+              <div className="section-label" style={{ marginBottom: 8 }}>Add service</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 14 }}>
+                {activeServices.map(svc => {
+                  const done = loggedServiceIds.has(svc.id)
+                  return (
+                    <button
+                      key={svc.id}
+                      onClick={() => !done && handleLogService(svc)}
+                      disabled={logging !== null}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        padding: '9px 14px',
+                        background: done ? '#C8E6C9' : '#fff',
+                        border: `1.5px solid ${done ? '#8EC892' : '#C8E0CA'}`,
+                        borderRadius: 20,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: done ? '#1F7326' : '#2E4F30',
+                        cursor: done ? 'default' : 'pointer',
+                        whiteSpace: 'nowrap',
+                        minHeight: 40,
+                        fontFamily: 'inherit',
+                        WebkitTapHighlightColor: 'transparent',
+                        transition: 'background 0.12s, border-color 0.12s',
+                        opacity: logging && logging !== svc.id ? 0.6 : 1,
+                      }}
+                    >
+                      {done && <Check size={13} strokeWidth={3} />}
+                      {svc.name}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="divider" />
+
+              {/* Counseling */}
+              <div className="section-label" style={{ marginBottom: 10 }}>Add counseling</div>
+
+              {/* Counselor name row */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={tempCounselorName}
+                  onChange={e => setTempCounselorName(e.target.value)}
+                  placeholder="Counselor name (optional)…"
+                  onClick={e => e.stopPropagation()}
+                  onFocus={e => {
+                    e.stopPropagation()
+                    setTimeout(() => { e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 350)
+                  }}
                   style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                    padding: '5px 10px', background: done ? '#C8E6C9' : '#fff',
-                    border: `1px solid ${done ? '#BDBDBD' : '#B8D8B2'}`,
-                    borderRadius: 20, fontSize: 11,
-                    color: done ? '#9E9E9E' : '#2E7D32',
-                    cursor: done ? 'default' : 'pointer',
-                    whiteSpace: 'nowrap',
+                    flex: 1,
+                    padding: '12px 14px',
+                    fontSize: '16px',
+                    borderRadius: 10,
+                    border: '1.5px solid #C8E0CA',
+                    minWidth: 0,
+                    background: '#fff',
+                    color: '#152415',
+                    fontFamily: 'inherit',
+                  }}
+                />
+                <button
+                  onClick={handleSaveCounselorName}
+                  style={{
+                    padding: '10px 14px',
+                    background: '#1F7326',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    fontFamily: 'inherit',
+                    WebkitTapHighlightColor: 'transparent',
+                    minHeight: 48,
+                    flexShrink: 0,
                   }}
                 >
-                  {done && <Check size={11} />}{svc.name}
+                  <Save size={14} /> Save
                 </button>
-              )
-            })}
-          </div>
+              </div>
 
-          {/* Separator */}
-          <div style={{ height: 1, background: '#D8E8D8', margin: '10px 0' }} />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+                {COUNSEL_TYPES.map(type => {
+                  const done = loggedCounselTypes.has(type)
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => handleLogCounsel(type)}
+                      disabled={logging !== null || done}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        padding: '9px 14px',
+                        background: done ? '#8EC892' : '#fff',
+                        border: `1.5px solid ${done ? '#5DAF62' : '#C8E0CA'}`,
+                        borderRadius: 20,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: done ? '#0C3D10' : '#2E4F30',
+                        cursor: done ? 'default' : 'pointer',
+                        whiteSpace: 'nowrap',
+                        minHeight: 40,
+                        fontFamily: 'inherit',
+                        WebkitTapHighlightColor: 'transparent',
+                        transition: 'background 0.12s, border-color 0.12s',
+                      }}
+                    >
+                      {done && <Check size={13} strokeWidth={3} />}
+                      {type}
+                    </button>
+                  )
+                })}
+              </div>
 
-          {/* Counseling */}
-          <div style={{ fontSize: 10, fontWeight: 500, color: '#7A9A7A', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 7 }}>
-            Add counseling
-          </div>
-          {/* Counselor name */}
-          <div
-            className="mobile-stack"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              marginBottom: 8,
-            }}
-          >
-            <input
-              ref={inputRef}
-              type="text"
-              value={tempCounselorName}
-              onChange={e => setTempCounselorName(e.target.value)}
-              placeholder="Enter counselor name…"
-              onClick={e => e.stopPropagation()}
-              onFocus={(e) => {
-                setTimeout(() => {
-                  e.target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                  })
-                }, 300)
-              }}
-              style={{
-                flex: 1,
-                padding: '10px 12px',
-                fontSize: 16,
-                borderRadius: 10,
-                border: '1px solid #B8D8B2',
-                minWidth: 0,
-              }}
-            />
-            <button onClick={handleSaveCounselorName} style={{ padding: '6px 12px', background: '#2E7D32', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <Save size={12} /> Save
-            </button>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 5,
-              paddingBottom: 5,
-            }}
-          >
-            {COUNSEL_TYPES.map(type => {
-              const done = loggedCounselTypes.has(type)
-              return (
-                <button
-                  key={type}
-                  onClick={() => handleLogCounsel(type)}
-                  disabled={logging !== null || done}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                    padding: '5px 10px', background: done ? '#A5D6A7' : '#fff',
-                    border: `1px solid ${done ? '#BDBDBD' : '#B8D8B2'}`,
-                    borderRadius: 20, fontSize: 11,
-                    color: done ? '#9E9E9E' : '#2E7D32',
-                    cursor: done ? 'default' : 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {done && <Check size={11} />}{type}
+              {/* Footer actions */}
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 8,
+                  marginTop: 14,
+                  paddingTop: 14,
+                  borderTop: '1px solid #D6EED8',
+                }}
+              >
+                <button className="action-btn sm" onClick={e => { e.stopPropagation(); onViewDetail() }}>
+                  <Eye size={13} /> Details
                 </button>
-              )
-            })}
-          </div>
-
-          {/* Footer actions */}
-          <div
-            className="mobile-actions"
-            style={{
-              display: 'flex',
-              gap: 6,
-              marginTop: 10,
-              paddingTop: 10,
-              borderTop: '1px solid #D8E8D8',
-            }}
-          >
-            <button className="action-btn sm" onClick={e => { e.stopPropagation(); onViewDetail() }}>
-              <Eye size={11} /> View details
-            </button>
-            <button className="action-btn sm" onClick={e => { e.stopPropagation(); onEdit() }}>
-              <Pencil size={11} /> Edit
-            </button>
-            <button className="action-btn sm danger" onClick={e => { e.stopPropagation(); onDelete() }}>
-              <Trash2 size={11} /> Delete
-            </button>
-          </div>
+                <button className="action-btn sm" onClick={e => { e.stopPropagation(); onEdit() }}>
+                  <Pencil size={13} /> Edit
+                </button>
+                <button className="action-btn sm danger" style={{ marginLeft: 'auto' }} onClick={e => { e.stopPropagation(); onDelete() }}>
+                  <Trash2 size={13} /> Delete
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

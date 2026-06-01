@@ -17,21 +17,58 @@ const tabs: { id: Tab; label: string; Icon: ElementType }[] = [
 
 export function TabBar({ active, onTabChange }: TabBarProps) {
   return (
-    <div style={{ background: '#fff', borderBottom: '1px solid #D8E8D8', display: 'flex', position: 'sticky', top: 54, zIndex: 40 }}>
+    <div
+      style={{
+        background: '#fff',
+        borderBottom: '1px solid #C8E0CA',
+        display: 'flex',
+        position: 'sticky',
+        top: 62,
+        zIndex: 40,
+        padding: '0 8px',
+        gap: 4,
+        boxShadow: '0 2px 8px rgba(21,36,21,0.05)',
+      }}
+    >
       {tabs.map(({ id, label, Icon }) => {
         const isActive = active === id
         const btnStyle: CSSProperties = {
-          flex: 1, padding: '10px 4px', fontSize: 11, textAlign: 'center',
-          color: isActive ? '#2E7D32' : '#7A9A7A',
-          borderBottom: `2px solid ${isActive ? '#2E7D32' : 'transparent'}`,
-          fontWeight: isActive ? 500 : 400,
-          background: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-          cursor: 'pointer', transition: 'color .15s',
+          flex: 1,
+          padding: '10px 8px 8px',
+          fontSize: 11,
+          fontWeight: isActive ? 700 : 500,
+          color: isActive ? '#1F7326' : '#8AAA8C',
+          background: 'none',
+          border: 'none',
+          borderBottom: `3px solid ${isActive ? '#1F7326' : 'transparent'}`,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 3,
+          cursor: 'pointer',
+          transition: 'color 0.15s, border-color 0.15s',
+          WebkitTapHighlightColor: 'transparent',
+          minHeight: 54,
+          letterSpacing: '0.02em',
+          textTransform: 'uppercase',
+          position: 'relative',
         }
         return (
           <button key={id} onClick={() => onTabChange(id)} style={btnStyle}>
-            <Icon size={17} />
+            {isActive && (
+              <div style={{
+                position: 'absolute',
+                top: 6,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 32,
+                height: 32,
+                borderRadius: 10,
+                background: '#E8F5E9',
+                zIndex: -1,
+              }} />
+            )}
+            <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
             <span>{label}</span>
           </button>
         )

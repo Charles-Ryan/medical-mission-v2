@@ -1,101 +1,81 @@
 'use client'
-
 import { useState, useEffect, useRef } from 'react'
 import { X, ChevronDown, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
-import {
-  createPatient,
-  updatePatient,
-  getNextPatientNumber,
-} from '@/lib/db'
+import { createPatient, updatePatient, getNextPatientNumber } from '@/lib/db'
 import type { Patient } from '@/lib/types'
 
 interface PatientFormProps {
   patient?: Patient | null
+  registrationType?: 'walk_in' | 'pre_registered'
   onClose: () => void
   onSaved: () => void
 }
 
 function keyboardSafeScroll(el: HTMLElement | null) {
   if (!el) return
-
   setTimeout(() => {
-    el.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-    })
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, 350)
 }
 
 export function PatientForm({
   patient,
+  registrationType = 'walk_in',
   onClose,
   onSaved,
 }: PatientFormProps) {
   const isEdit = !!patient
+  const regType = patient?.registration_type ?? registrationType
 
   const [nextNum, setNextNum] = useState<number | null>(null)
   const [medOpen, setMedOpen] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const fullNameRef = useRef<HTMLInputElement>(null)
-  const ageRef = useRef<HTMLInputElement>(null)
-  const contactRef = useRef<HTMLInputElement>(null)
-  const addressRef = useRef<HTMLInputElement>(null)
-  const medicalRef = useRef<HTMLTextAreaElement>(null)
+  const ageRef      = useRef<HTMLInputElement>(null)
+  const contactRef  = useRef<HTMLInputElement>(null)
+  const addressRef  = useRef<HTMLInputElement>(null)
+  const medicalRef  = useRef<HTMLTextAreaElement>(null)
 
   const [form, setForm] = useState({
-    full_name: patient?.full_name || '',
-    age: patient?.age?.toString() || '',
-    gender: (patient?.gender || 'Male') as 'Male' | 'Female',
-    contact_number: patient?.contact_number || '',
-    address: patient?.address || '',
+    full_name:       patient?.full_name       || '',
+    age:             patient?.age?.toString() || '',
+    gender:          (patient?.gender || 'Male') as 'Male' | 'Female',
+    contact_number:  patient?.contact_number  || '',
+    address:         patient?.address         || '',
     medical_history: patient?.medical_history || '',
   })
 
   useEffect(() => {
-    if (!isEdit) {
+    if (!isEdit && regType === 'walk_in') {
       getNextPatientNumber().then(setNextNum)
     }
-  }, [isEdit])
+  }, [isEdit, regType])
 
-  const set = (key: string, val: string) =>
-    setForm(f => ({
-      ...f,
-      [key]: val,
-    }))
+  const set = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }))
 
   const handleSubmit = async () => {
-    if (!form.full_name.trim()) {
-      toast.error('Full name is required')
-      return
-    }
-
-    if (!form.age || isNaN(Number(form.age))) {
-      toast.error('Valid age is required')
-      return
-    }
+    if (!form.full_name.trim()) { toast.error('Full name is required'); return }
+    if (!form.age || isNaN(Number(form.age))) { toast.error('Valid age is required'); return }
 
     setSaving(true)
-
     try {
       const payload = {
-        full_name: form.full_name.trim(),
-        age: Number(form.age),
-        gender: form.gender,
-        contact_number: form.contact_number.trim() || null,
-        address: form.address.trim() || null,
+        full_name:       form.full_name.trim(),
+        age:             Number(form.age),
+        gender:          form.gender,
+        contact_number:  form.contact_number.trim() || null,
+        address:         form.address.trim()        || null,
         medical_history: form.medical_history.trim() || null,
       }
-
       if (isEdit) {
         await updatePatient(patient!.id, payload)
         toast.success('Patient updated')
       } else {
-        await createPatient(payload)
-        toast.success('Patient registered')
+        await createPatient({ ...payload, registration_type: regType, is_arrived: regType === 'walk_in' })
+        toast.success(regType === 'walk_in' ? 'Walk-in patient registered' : 'Patient pre-registered')
       }
-
       onSaved()
       onClose()
     } catch {
@@ -105,60 +85,40 @@ export function PatientForm({
     }
   }
 
+  const isPreReg = regType === 'pre_registered'
+
   const inputStyle = {
     width: '100%',
-    padding: '14px 14px',
-    border: '1px solid #B8D8B2',
-    borderRadius: 10,
-    fontSize: 16,
+    padding: '14px 16px',
+    border: '1.5px solid #C8E0CA',
+    borderRadius: 12,
+    fontSize: '16px',
     background: '#fff',
-    color: '#1C2B1C',
-    outline: 'none',
+    color: '#152415',
+    fontFamily: 'inherit',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
   }
 
   const labelStyle = {
-    fontSize: 11,
-    fontWeight: 500 as const,
-    color: '#3D5C3D',
-    marginBottom: 4,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 4,
+    fontSize: 12,
+    fontWeight: 700 as const,
+    color: '#2E4F30',
+    marginBottom: 6,
+    display: 'block',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.45)',
-        zIndex: 999,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        WebkitOverflowScrolling: 'touch',
-        padding: '20px 12px 120px',
-      }}
-    >
-      <div
-        style={{
-          background: '#F5FAF5',
-          borderRadius: 18,
-          width: '100%',
-          maxWidth: 600,
-          margin: '0 auto',
-          minHeight: 'fit-content',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-        }}
-      >
+    <div className="page-modal-overlay" onClick={onClose}>
+      <div className="page-modal" onClick={e => e.stopPropagation()}>
+
         {/* Header */}
         <div
           style={{
-            padding: '14px 16px',
+            padding: '16px 18px',
             background: '#fff',
-            borderBottom: '1px solid #D8E8D8',
+            borderBottom: '1px solid #C8E0CA',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -167,29 +127,33 @@ export function PatientForm({
             zIndex: 20,
           }}
         >
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: '#1C2B1C',
-            }}
-          >
-            {isEdit ? 'Edit patient' : 'New patient'}
-          </span>
-
+          <div>
+            <span style={{ fontSize: 17, fontWeight: 700, color: '#152415', letterSpacing: '-0.02em' }}>
+              {isEdit ? 'Edit patient' : isPreReg ? 'Pre-register patient' : 'Walk-in registration'}
+            </span>
+            {!isEdit && (
+              <div style={{ fontSize: 12, color: isPreReg ? '#E65100' : '#1F7326', marginTop: 3, fontWeight: 600 }}>
+                {isPreReg ? 'ID assigned on arrival' : 'ID assigned immediately on save'}
+              </div>
+            )}
+          </div>
           <button
             onClick={onClose}
             style={{
-              background: 'none',
-              border: 'none',
+              background: '#F2F9F2',
+              border: '1px solid #C8E0CA',
+              borderRadius: 10,
               cursor: 'pointer',
-              color: '#7A9A7A',
+              color: '#8AAA8C',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              width: 36,
+              height: 36,
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
@@ -197,69 +161,57 @@ export function PatientForm({
         <div
           style={{
             overflowY: 'auto',
-            overflowX: 'hidden',
-            padding: 16,
+            padding: '18px 18px',
             flex: 1,
             WebkitOverflowScrolling: 'touch',
-            paddingBottom: 200,
+            paddingBottom: 220,
           }}
         >
+          {/* ID badge */}
           {!isEdit && (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                padding: '11px 14px',
-                background: '#F0F7F0',
-                border: '1px solid #C8E6C9',
-                borderRadius: 10,
-                marginBottom: 16,
+                gap: 14,
+                padding: '14px 16px',
+                background: isPreReg ? '#FFF8E1' : '#E8F5E9',
+                border: `1.5px solid ${isPreReg ? '#FFE082' : '#A8D0AB'}`,
+                borderRadius: 14,
+                marginBottom: 20,
               }}
             >
-              <span
+              <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 28,
                   fontWeight: 700,
-                  color: '#2E7D32',
+                  color: isPreReg ? '#E65100' : '#1F7326',
+                  letterSpacing: '-1px',
+                  lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                #{nextNum ? String(nextNum).padStart(3, '0') : '...'}
-              </span>
-
+                {isPreReg ? '#—' : `#${nextNum ? String(nextNum).padStart(3, '0') : '...'}`}
+              </div>
               <div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: '#2E7D32',
-                  }}
-                >
-                  Auto-assigned ID
+                <div style={{ fontSize: 13, fontWeight: 700, color: isPreReg ? '#E65100' : '#1F7326' }}>
+                  {isPreReg ? 'ID assigned on arrival' : 'Auto-assigned on save'}
                 </div>
-
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: '#7A9A7A',
-                    marginTop: 2,
-                  }}
-                >
-                  Registered immediately on save
+                <div style={{ fontSize: 12, color: '#8AAA8C', marginTop: 3 }}>
+                  {isPreReg
+                    ? 'Mark as arrived on mission day'
+                    : 'Patient registered immediately'}
                 </div>
               </div>
             </div>
           )}
 
           {/* Full name */}
-          <div style={{ marginBottom: 14 }}>
+          <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>
-              Full name
-              <span style={{ color: '#D32F2F', fontSize: 12 }}>*</span>
+              Full name <span style={{ color: '#C62828', textTransform: 'none', fontWeight: 400 }}>*</span>
             </label>
-
             <input
-              required
               ref={fullNameRef}
               style={inputStyle}
               type="text"
@@ -267,53 +219,33 @@ export function PatientForm({
               placeholder="Enter full name"
               onFocus={() => keyboardSafeScroll(fullNameRef.current)}
               onChange={e => set('full_name', e.target.value)}
+              autoComplete="name"
             />
           </div>
 
           {/* Age + Gender */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns:
-                typeof window !== 'undefined' &&
-                window.innerWidth < 768
-                  ? '1fr'
-                  : '1fr 1fr',
-              gap: 12,
-              marginBottom: 14,
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
             <div>
               <label style={labelStyle}>
-                Age
-                <span style={{ color: '#D32F2F', fontSize: 12 }}>*</span>
+                Age <span style={{ color: '#C62828', textTransform: 'none', fontWeight: 400 }}>*</span>
               </label>
-
               <input
-                required
                 ref={ageRef}
                 style={inputStyle}
                 type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={form.age}
                 placeholder="Age"
                 onFocus={() => keyboardSafeScroll(ageRef.current)}
                 onChange={e => set('age', e.target.value)}
               />
             </div>
-
             <div>
               <label style={labelStyle}>
-                Gender
-                <span style={{ color: '#D32F2F', fontSize: 12 }}>*</span>
+                Gender <span style={{ color: '#C62828', textTransform: 'none', fontWeight: 400 }}>*</span>
               </label>
-
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 8,
-                  flexWrap: 'wrap',
-                }}
-              >
+              <div style={{ display: 'flex', gap: 8 }}>
                 {(['Male', 'Female'] as const).map(g => (
                   <button
                     key={g}
@@ -321,20 +253,18 @@ export function PatientForm({
                     onClick={() => set('gender', g)}
                     style={{
                       flex: 1,
-                      minWidth: 100,
-                      padding: '12px 16px',
-                      borderRadius: 999,
+                      padding: '13px 8px',
+                      borderRadius: 12,
                       fontSize: 14,
+                      fontWeight: 700,
                       cursor: 'pointer',
-                      background:
-                        form.gender === g ? '#2E7D32' : '#fff',
-                      color:
-                        form.gender === g ? '#fff' : '#3D5C3D',
-                      border: `1px solid ${
-                        form.gender === g
-                          ? '#2E7D32'
-                          : '#B8D8B2'
-                      }`,
+                      background: form.gender === g ? '#1F7326' : '#fff',
+                      color: form.gender === g ? '#fff' : '#5A7E5C',
+                      border: `1.5px solid ${form.gender === g ? '#1F7326' : '#C8E0CA'}`,
+                      fontFamily: 'inherit',
+                      WebkitTapHighlightColor: 'transparent',
+                      transition: 'background 0.12s, color 0.12s, border-color 0.12s',
+                      minHeight: 48,
                     }}
                   >
                     {g}
@@ -345,24 +275,24 @@ export function PatientForm({
           </div>
 
           {/* Contact */}
-          <div style={{ marginBottom: 14 }}>
+          <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>Contact number</label>
-
             <input
               ref={contactRef}
               style={inputStyle}
               type="tel"
+              inputMode="tel"
               value={form.contact_number}
               placeholder="09XXXXXXXXX"
               onFocus={() => keyboardSafeScroll(contactRef.current)}
               onChange={e => set('contact_number', e.target.value)}
+              autoComplete="tel"
             />
           </div>
 
           {/* Address */}
-          <div style={{ marginBottom: 14 }}>
+          <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>Address</label>
-
             <input
               ref={addressRef}
               style={inputStyle}
@@ -371,42 +301,38 @@ export function PatientForm({
               placeholder="Enter address"
               onFocus={() => keyboardSafeScroll(addressRef.current)}
               onChange={e => set('address', e.target.value)}
+              autoComplete="street-address"
             />
           </div>
 
           {/* Medical history toggle */}
-          <div
+          <button
+            type="button"
             onClick={() => setMedOpen(o => !o)}
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 14px',
-              background: '#EEF6EE',
-              border: '1px solid #D8E8D8',
-              borderRadius: 10,
+              width: '100%',
+              padding: '14px 16px',
+              background: '#E8F5E9',
+              border: '1.5px solid #C8E0CA',
+              borderRadius: medOpen ? '12px 12px 0 0' : 12,
               cursor: 'pointer',
-              marginBottom: 8,
+              marginBottom: medOpen ? 0 : 0,
+              fontFamily: 'inherit',
+              WebkitTapHighlightColor: 'transparent',
+              transition: 'background 0.15s',
             }}
           >
-            <div>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#3D5C3D',
-                }}
-              >
-                Medical history
-              </div>
-            </div>
-
-            {medOpen ? (
-              <ChevronUp size={15} color="#7A9A7A" />
-            ) : (
-              <ChevronDown size={15} color="#7A9A7A" />
-            )}
-          </div>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#2E4F30' }}>
+              Medical history (optional)
+            </span>
+            {medOpen
+              ? <ChevronUp size={16} color="#8AAA8C" />
+              : <ChevronDown size={16} color="#8AAA8C" />
+            }
+          </button>
 
           {medOpen && (
             <textarea
@@ -415,13 +341,13 @@ export function PatientForm({
                 ...inputStyle,
                 resize: 'vertical',
                 minHeight: 120,
-                fontFamily: 'inherit',
+                borderRadius: '0 0 12px 12px',
+                borderTop: 'none',
               }}
               value={form.medical_history}
+              placeholder="Enter relevant medical history…"
               onFocus={() => keyboardSafeScroll(medicalRef.current)}
-              onChange={e =>
-                set('medical_history', e.target.value)
-              }
+              onChange={e => set('medical_history', e.target.value)}
             />
           )}
         </div>
@@ -429,11 +355,11 @@ export function PatientForm({
         {/* Footer */}
         <div
           style={{
-            padding: '12px 16px',
+            padding: '14px 18px',
             background: '#fff',
-            borderTop: '1px solid #D8E8D8',
+            borderTop: '1px solid #C8E0CA',
             display: 'flex',
-            gap: 8,
+            gap: 10,
             position: 'sticky',
             bottom: 0,
             zIndex: 20,
@@ -442,34 +368,42 @@ export function PatientForm({
           <button
             onClick={onClose}
             style={{
-              padding: '12px 16px',
-              border: '1px solid #B8D8B2',
-              borderRadius: 10,
-              fontSize: 14,
+              padding: '14px 20px',
+              border: '1.5px solid #C8E0CA',
+              borderRadius: 12,
+              fontSize: 15,
+              fontWeight: 600,
               background: '#fff',
-              color: '#757575',
+              color: '#8AAA8C',
               cursor: 'pointer',
+              fontFamily: 'inherit',
+              minHeight: 52,
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
             Cancel
           </button>
-
           <button
-            className="action-btn"
+            className="btn-primary"
             onClick={handleSubmit}
             disabled={saving}
             style={{
               flex: 1,
-              justifyContent: 'center',
-              padding: '12px 16px',
-              fontSize: 14,
+              background: isPreReg && !isEdit
+                ? 'linear-gradient(135deg, #E65100 0%, #BF360C 100%)'
+                : undefined,
+              boxShadow: isPreReg && !isEdit
+                ? '0 4px 14px rgba(230,81,0,0.35)'
+                : undefined,
             }}
           >
             {saving
-              ? 'Saving...'
+              ? 'Saving…'
               : isEdit
               ? 'Save changes →'
-              : 'Save & register →'}
+              : isPreReg
+              ? 'Pre-register →'
+              : 'Register walk-in →'}
           </button>
         </div>
       </div>

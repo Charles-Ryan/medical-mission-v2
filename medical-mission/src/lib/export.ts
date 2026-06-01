@@ -2,8 +2,9 @@ import type { PatientWithLogs } from './types'
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-function padId(n: number) {
-  return String(n)
+function padId(n: number | null) {
+  if (n == null) return '—'
+  return String(n).padStart(3, '0')
 }
 
 function counselStatus(patient: PatientWithLogs): string {

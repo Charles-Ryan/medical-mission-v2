@@ -1,12 +1,15 @@
 export interface Patient {
   id: string
-  patient_number: number
+  patient_number: number | null   // null until pre-reg patient arrives
   full_name: string
   age: number
   gender: 'Male' | 'Female'
   contact_number: string | null
   address: string | null
   medical_history: string | null
+  registration_type: 'walk_in' | 'pre_registered'
+  is_arrived: boolean
+  arrived_at: string | null
   created_at: string
 }
 

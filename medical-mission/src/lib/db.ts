@@ -3,7 +3,7 @@ import type { Patient, Service, PatientService, CounselLog, PatientWithLogs, Das
 
 // ─── PATIENTS ────────────────────────────────────────────────────────────────
 
-export async function getPatients(search = '', serviceId = '') {
+export async function getPatients(search = '', serviceId = '', tab: 'arrived' | 'pre_registered' | 'all' = 'arrived') {
   const supabase = createClient()
   let query = supabase
     .from('patients')
@@ -12,7 +12,14 @@ export async function getPatients(search = '', serviceId = '') {
       patient_services(*, service:services(*)),
       counsel_logs(*)
     `)
-    .order('patient_number', { ascending: true })
+    .order('patient_number', { ascending: true, nullsFirst: false })
+
+  // Tab filtering
+  if (tab === 'arrived') {
+    query = query.eq('is_arrived', true)
+  } else if (tab === 'pre_registered') {
+    query = query.eq('registration_type', 'pre_registered').eq('is_arrived', false)
+  }
 
   if (search) {
     query = query.or(
@@ -52,13 +59,61 @@ export async function getNextPatientNumber() {
   const { data, error } = await supabase
     .from('patients')
     .select('patient_number')
+    .not('patient_number', 'is', null)
     .order('patient_number', { ascending: false })
     .limit(1)
   if (error) throw error
   return data && data.length > 0 ? data[0].patient_number + 1 : 1
 }
 
-export async function createPatient(patient: Omit<Patient, 'id' | 'patient_number' | 'created_at'>) {
+export async function createPatient(
+  patient: Omit<Patient, 'id' | 'patient_number' | 'created_at' | 'arrived_at'>,
+) {
+  const supabase = createClient()
+
+  // Walk-ins get a patient_number immediately; pre-registered patients get null
+  if (patient.registration_type === 'walk_in') {
+    const maxAttempts = 5
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const nextNum = await getNextPatientNumber()
+      const { data, error } = await supabase
+        .from('patients')
+        .insert({
+          ...patient,
+          patient_number: nextNum,
+          is_arrived: true,
+          arrived_at: new Date().toISOString(),
+        })
+        .select()
+        .single()
+
+      if (!error) return data as Patient
+
+      const isDuplicate =
+        error.code === '23505' ||
+        error.message?.includes('duplicate key') ||
+        error.details?.includes('already exists')
+      if (!isDuplicate) throw error
+    }
+    throw new Error('Could not assign unique patient number after several attempts')
+  } else {
+    // Pre-registered: no patient_number, not arrived yet
+    const { data, error } = await supabase
+      .from('patients')
+      .insert({
+        ...patient,
+        patient_number: null,
+        is_arrived: false,
+        arrived_at: null,
+      })
+      .select()
+      .single()
+    if (error) throw error
+    return data as Patient
+  }
+}
+
+export async function markPatientArrived(id: string): Promise<Patient> {
   const supabase = createClient()
   const maxAttempts = 5
 
@@ -66,16 +121,23 @@ export async function createPatient(patient: Omit<Patient, 'id' | 'patient_numbe
     const nextNum = await getNextPatientNumber()
     const { data, error } = await supabase
       .from('patients')
-      .insert({ ...patient, patient_number: nextNum })
+      .update({
+        patient_number: nextNum,
+        is_arrived: true,
+        arrived_at: new Date().toISOString(),
+      })
+      .eq('id', id)
       .select()
       .single()
 
     if (!error) return data as Patient
 
-    const isDuplicate = error.code === '23505' || error.message?.includes('duplicate key') || error.details?.includes('already exists')
+    const isDuplicate =
+      error.code === '23505' ||
+      error.message?.includes('duplicate key') ||
+      error.details?.includes('already exists')
     if (!isDuplicate) throw error
   }
-
   throw new Error('Could not assign unique patient number after several attempts')
 }
 
@@ -176,7 +238,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = createClient()
 
   const [patientsRes, servicesRes, counselRes, svcBreakdownRes, cslBreakdownRes, allServicesRes] = await Promise.all([
-    supabase.from('patients').select('id', { count: 'exact', head: true }),
+    // Only count arrived patients
+    supabase.from('patients').select('id', { count: 'exact', head: true }).eq('is_arrived', true),
     supabase.from('patient_services').select('id', { count: 'exact', head: true }),
     supabase.from('counsel_logs').select('id', { count: 'exact', head: true }),
     supabase.from('patient_services').select('service:services(name)'),
@@ -186,31 +249,20 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   // Service breakdown - include all active services
   const svcMap: Record<string, number> = {}
-
   ;(svcBreakdownRes.data || []).forEach((ps: any) => {
-    const serviceData = Array.isArray(ps.service)
-      ? ps.service[0]
-      : ps.service
-
+    const serviceData = Array.isArray(ps.service) ? ps.service[0] : ps.service
     const name = (serviceData?.name || 'Unknown').trim()
-
     svcMap[name] = (svcMap[name] || 0) + 1
   })
 
   const activeServiceNames = new Set(
-    (allServicesRes.data || []).map(
-      (s: { name: string }) => s.name.trim()
-    )
+    (allServicesRes.data || []).map((s: { name: string }) => s.name.trim())
   )
 
   const service_breakdown = Array.from(activeServiceNames)
-    .map(name => ({
-      name,
-      count: svcMap[name] || 0
-    }))
+    .map(name => ({ name, count: svcMap[name] || 0 }))
     .sort((a, b) => b.count - a.count)
 
-  // Counsel breakdown
   const cslMap: Record<string, number> = {}
   ;(cslBreakdownRes.data || []).forEach((cl: { counsel_type: string }) => {
     cslMap[cl.counsel_type] = (cslMap[cl.counsel_type] || 0) + 1
@@ -237,6 +289,7 @@ export async function getAllPatientsForExport() {
       patient_services(*, service:services(name)),
       counsel_logs(counsel_type, counselor_name, logged_at)
     `)
+    .eq('is_arrived', true)
     .order('patient_number', { ascending: true })
   if (error) throw error
   return (data || []) as PatientWithLogs[]
