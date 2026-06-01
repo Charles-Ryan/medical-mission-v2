@@ -94,35 +94,41 @@ export function DashboardPage() {
       <button
         onClick={handleExportPDF}
         style={{
-          fontSize: 11,
-          padding: '4px 8px',
-          borderRadius: 6,
-          border: '1px solid #C8E6C9',
-          background: '#F0F7F0',
+          fontSize: 15,
+          fontWeight: 600,
+          padding: '12px 20px',
+          borderRadius: 10,
+          border: '1px solid #2E7D32',
+          background: '#2E7D32',
+          color: '#fff',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
+          gap: 8,
         }}
       >
-        <FileText size={12} /> PDF
+        <FileText size={18} />
+        Export PDF
       </button>
 
       <button
         onClick={handleExportCSV}
         style={{
-          fontSize: 11,
-          padding: '4px 8px',
-          borderRadius: 6,
-          border: '1px solid #C8E6C9',
-          background: '#F0F7F0',
+          fontSize: 15,
+          fontWeight: 600,
+          padding: '12px 20px',
+          borderRadius: 10,
+          border: '1px solid #2E7D32',
+          background: '#2E7D32',
+          color: '#fff',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
+          gap: 8,
         }}
       >
-        <Download size={12} /> CSV
+        <Download size={18} />
+        Export CSV
       </button>
     </>
   )
@@ -174,6 +180,18 @@ export function DashboardPage() {
           </div>
         </div>
 
+        {/* Export Buttons */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+            marginBottom: 14,
+            flexWrap: 'wrap',
+          }}
+        >
+          {exportButtons}
+        </div>
+
         {/* Stat cards */}
         <div
           style={{
@@ -220,7 +238,7 @@ export function DashboardPage() {
           {/* SERVICES + EXPORT BUTTONS MOVED HERE */}
           {card(
             <>
-              {cardHdr('Services breakdown', exportButtons)}
+              {cardHdr('Services breakdown')}
 
               {loading ? (
                 <div style={{ padding: 20, color: '#7A9A7A' }}>Loading…</div>
