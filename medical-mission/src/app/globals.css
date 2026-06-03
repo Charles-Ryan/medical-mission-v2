@@ -90,35 +90,183 @@ body {
 
 /* ── APP SHELL ── */
 .app-shell {
-  min-height: 100dvh;
-  background: var(--bg3);
+  height: 100dvh;
+  background: var(--bg2);
   display: flex;
-  justify-content: center;
+  overflow: hidden;
 }
 
+/*
+  Mobile: full-width single column.
+  height: 100dvh + overflow:hidden so .app-main can subdivide the
+  viewport into fixed header slots + a scrollable content slot.
+*/
 .app-inner {
   width: 100%;
   display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
+  flex-direction: row;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--bg2);
-  position: relative;
 }
 
-@media (min-width: 640px) and (max-width: 1023px) {
-  .app-inner { max-width: 100%; }
+/* Sidebar hidden on mobile */
+.app-sidebar { display: none; }
+
+/*
+  Mobile main column — flex column.
+  TopBar + TabBar are flex-shrink:0 rows at the top.
+  .app-content takes the remaining height and scrolls.
+*/
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  min-width: 0;
 }
 
+/* TopBar row — never scrolls away */
+.app-topbar { flex-shrink: 0; }
+
+/* TabBar row — never scrolls away */
+.app-tabbar { flex-shrink: 0; }
+
+/* Desktop content header hidden on mobile */
+.desktop-content-header { display: none; }
+
+/* ── DESKTOP LAYOUT (≥1024px): sidebar + main column ── */
 @media (min-width: 1024px) {
-  .app-shell { background: var(--bg3); }
-  .app-inner {
-    max-width: 900px;
-    box-shadow: var(--shadow-lg), 0 0 0 1px var(--bdr);
-    border-radius: 0;
+  .app-shell { background: #0C3D10; }
+
+  /* Sidebar becomes visible */
+  .app-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    min-width: 240px;
+    background: linear-gradient(180deg, #1F7326 0%, #0C3D10 100%);
+    height: 100dvh;
+    flex-shrink: 0;
+    z-index: 50;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.25);
+  }
+
+  /* TopBar + TabBar hidden on desktop — sidebar handles nav */
+  .app-topbar { display: none !important; }
+  .app-tabbar { display: none !important; }
+
+  /* Desktop content header visible */
+  .desktop-content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--bdr);
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(21,36,21,0.06);
   }
 }
 
-.app-content { flex: 1; overflow: auto; }
+/* Single scroll container — ALL pages scroll inside here, never inside a child */
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Required so position:sticky children (PatientsPage toolbar) work correctly */
+  position: relative;
+}
+
+/* ── Large desktop: even more comfortable ── */
+@media (min-width: 1440px) {
+  .app-sidebar { width: 260px; min-width: 260px; }
+}
+
+/* ── DESKTOP SIDEBAR NAV ── */
+.sidebar-brand {
+  display: none;
+}
+.sidebar-nav {
+  display: none;
+}
+.sidebar-footer {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 12px;
+    flex: 1;
+  }
+
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: left;
+    width: 100%;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.01em;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sidebar-nav-item:hover {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.9);
+  }
+
+  .sidebar-nav-item.active {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .sidebar-nav-item.active .sidebar-nav-icon {
+    background: rgba(255,255,255,0.2);
+  }
+
+  .sidebar-nav-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: transparent;
+    transition: background 0.15s;
+  }
+
+  .sidebar-footer {
+    display: block;
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+}
 
 /* ── INPUTS ── */
 input, textarea, select {

@@ -80,21 +80,11 @@ export function DashboardPage() {
   ]
 
   return (
-    <div
-      style={{
-        height: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        background: '#F2F9F2',
-      }}
-    >
+    <div style={{ background: '#F2F9F2' }}>
       <div
         style={{
-          flex: 1,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
           padding: 16,
-          paddingBottom: 140,
+          paddingBottom: 100,
         }}
       >
 

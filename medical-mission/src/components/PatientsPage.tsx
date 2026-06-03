@@ -96,16 +96,7 @@ export function PatientsPage() {
   }
 
   return (
-    <div
-      style={{
-        background: '#F2F9F2',
-        height: '100dvh',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        WebkitOverflowScrolling: 'touch',
-        paddingBottom: 120,
-      }}
-    >
+    <div style={{ background: '#F2F9F2', minHeight: '100%' }}>
       {/* Sticky toolbar */}
       <div
         style={{
@@ -289,7 +280,7 @@ export function PatientsPage() {
       </div>
 
       {/* List */}
-      <div style={{ padding: '12px 12px', paddingBottom: 180, minHeight: 'calc(100dvh - 140px)' }}>
+      <div style={{ padding: '12px 12px', paddingBottom: 100 }}>
         {/* Count row */}
         <div style={{ fontSize: 12, color: '#8AAA8C', marginBottom: 12, fontWeight: 600, letterSpacing: '0.02em', padding: '0 2px' }}>
           {loading ? 'Loading…' : (
